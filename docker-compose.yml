@@ -1,0 +1,23 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of Invenio.
+# Copyright (C) 2017 CERN.
+#
+# Invenio is free software; you can redistribute it and/or modify it under the
+# terms of the MIT License; see LICENSE file for more details.
+#
+# In applying this license, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
+
+# Docker Compose file for starting an Elasticsearch node, needed by some of the
+# tests. Starting Elasticsearch is as simple as running::
+#
+#   docker-compose up
+
+version: '2.2'
+services:
+  es:
+    image: elasticsearch:5
+    ports:
+      - 9200:9200
