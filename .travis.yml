@@ -79,10 +79,10 @@ deploy:
   provider: pypi
   user: inveniosoftware
   password:
-    secure: TODO:PYPISECUREHASH
-  distributions: "sdist bdist_wheel"
+    secure: ZSy0cO6NjCFXxYBouB3xUmiXsO2kv639R7DjHkV63yeG4wbJtXLBa9G6A8llBoOoMLUEj8AKTFz53F5wLYj3Uy64/0gZB0SLWfBA6BF9+crYwACeJ74Icx4C0Ql9lGuMfbN6z97fMtYraZoUj0xp6KrCVkD0RSQfScLeRxEVeNrDjqoF+VF4/x/j02Z60mPt/hK8Bj4IPxdj0FzPlynpOEyWlyNqaRlke3fsOFj80yolMBKOcBcQjdGs+UC0OjOCQZgGwe+ZnROab4memckkT4WziZVUxtlXTanFpm7PP760OypzgunnDrhiklvYqulU/KqsuPsG5G+mEGCBJBWzSEHpRzSnyMVGhTu+LCN51s1Q+gGSIm3k9dQbTbBlWkDM4xXJYCA85wVyKGAVGSj0wSWAVFOogWZeyiLVGOV7SkZT79dOEWS25f0NF48eS8TRXcdkV2XF2rqoWRksANLuTD2vK88Z6IqqmsgFiA8mOHvxnm9zOuhdXPoiX93S/d8iZ8JOaDN547FXXLSqFMnvxln4QU0yb7h5/i9dgxYsfgXkK2AD7mOKtLGiPGNhpxtJrlwWM0ShtX/o1ichkDeZ55eLcP9s0jZVQDyczlNJ+QiQ7oEDIB0JoMmNFMlkAbWkg1MD/r5HR4FVt80xjejczfPBT9A5lRr8HDmpQHFXjKI=
+  distributions: sdist bdist_wheel
   on:
-    tags: true
-    python: "3.5"
-    repo: inveniosoftware/pytest-invenio
     condition: $DEPLOY = true
+    python: '3.5'
+    repo: inveniosoftware/pytest-invenio
+    tags: true
