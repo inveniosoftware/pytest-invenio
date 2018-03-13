@@ -31,10 +31,27 @@ from pytest_flask.plugin import _make_test_response_class
 from selenium import webdriver
 from sqlalchemy_utils.functions import create_database, database_exists
 
+
 SCREENSHOT_SCRIPT = """import base64
 with open('screenshot.png', 'wb') as fp:
     fp.write(base64.b64decode('''{data}'''))
 """
+
+
+@pytest.fixture(scope='module')
+def default_handler():
+    """Flask default logging handler.
+
+    Flask 0.13/1.0 changed logging to not add the default handler in case a
+    handler is already installed. pytest automatically adds a handler to the
+    root logger, causing Flask not to add a handler. This is an issue when
+    testing Click output which uses the logger to output to the console.
+    """
+    try:
+        from flask.logging import default_handler as handler
+        return handler
+    except ImportError:
+        return None
 
 
 @pytest.fixture(scope='module')
@@ -167,7 +184,7 @@ def app_config(db_uri, broker_uri, celery_config):
 
 
 @pytest.fixture(scope='module')
-def base_app(create_app, app_config, request):
+def base_app(create_app, app_config, request, default_handler):
     """Base application fixture (without database, search and cache).
 
     Scope: module.
@@ -202,7 +219,11 @@ def base_app(create_app, app_config, request):
     # Use create_app from the module if defined, otherwise use default
     # create_app fixture.
     create_app = getattr(request.module, 'create_app', create_app)
-    yield create_app(**app_config)
+    app_ = create_app(**app_config)
+    # See documentation for default_handler
+    if default_handler:
+        app_.logger.addHandler(default_handler)
+    yield app_
 
 
 @pytest.fixture(autouse=True, scope='function')

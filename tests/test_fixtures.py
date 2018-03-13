@@ -187,6 +187,27 @@ def test_clirunner(conftest_testdir):
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
+def test_clirunner_output(conftest_testdir):
+    """Test script info command."""
+    conftest_testdir.makepyfile("""
+        import click
+        from flask import current_app
+        from flask.cli import with_appcontext
+
+        # Define a command which logs to the application logger
+        @click.command()
+        @with_appcontext
+        def mycmd():
+            current_app.logger.error('My error')
+
+        # Run test that output is captured
+        def test_cli(cli_runner):
+            res = cli_runner(mycmd)
+            assert 'My error' in res.output
+    """)
+    conftest_testdir.runpytest().assert_outcomes(passed=1)
+
+
 def test_es(conftest_testdir):
     """Test Elasticsearch initialization."""
     conftest_testdir.makepyfile("""

@@ -9,3 +9,7 @@
 # In applying this license, CERN does not waive the privileges and immunities
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
+
+-e git+https://github.com/pallets/flask.git#egg=Flask
+-e git+https://github.com/pytest-dev/pytest-flask.git#egg=pytest-flask
+-e git+https://github.com/pytest-dev/pytest.git#egg=pytest
