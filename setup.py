@@ -23,7 +23,6 @@ tests_require = [
     'invenio-mail>=1.0.0,<1.1.0',
     'isort>=4.3',
     'pydocstyle>=2.0.0',
-    'pytest-cache>=1.0',
     'pytest-cov>=2.5.1',
     'pytest-pep8>=1.0.6',
     'urllib3>=1.21.1,<1.22'
