@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of Invenio.
-# Copyright (C) 2017 CERN.
+# This file is part of pytest-invenio.
+# Copyright (C) 2017-2018 CERN.
 #
-# Invenio is free software; you can redistribute it and/or modify it under the
-# terms of the MIT License; see LICENSE file for more details.
-#
-# In applying this license, CERN does not waive the privileges and immunities
-# granted to it by virtue of its status as an Intergovernmental Organization
-# or submit itself to any jurisdiction.
+# pytest-invenio is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
 
 addons:
   chrome: stable # https://docs.travis-ci.com/user/chrome
@@ -26,6 +22,8 @@ language: python
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - env: REQUIREMENTS=devel
 
 cache:
   - pip
@@ -35,9 +33,9 @@ env:
     - E2E_OUTPUT=base64
     - ES_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.4.tar.gz
   matrix:
-  - REQUIREMENTS=lowest
-  - REQUIREMENTS=release DEPLOY=true
-  - REQUIREMENTS=devel
+    - REQUIREMENTS=lowest
+    - REQUIREMENTS=release DEPLOY=true
+    - REQUIREMENTS=devel
 
 python:
   - "2.7"

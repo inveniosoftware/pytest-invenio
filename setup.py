@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of Invenio.
-# Copyright (C) 2017 CERN.
+# This file is part of pytest-invenio.
+# Copyright (C) 2017-2018 CERN.
 #
-# Invenio is free software; you can redistribute it and/or modify it under the
-# terms of the MIT License; see LICENSE file for more details.
-#
-# In applying this license, CERN does not waive the privileges and immunities
-# granted to it by virtue of its status as an Intergovernmental Organization
-# or submit itself to any jurisdiction.
+# pytest-invenio is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
 
 """Pytest fixtures for Invenio."""
 
@@ -24,7 +20,7 @@ tests_require = [
     'coverage>=4.0',
     'elasticsearch>=5.0.0,<6.0.0',
     'elasticsearch-dsl>=5.0.0,<6.0.0',
-    'invenio-mail>=1.0.0b1,<1.1.0',  # 'invenio-mail==1.0.*',
+    'invenio-mail>=1.0.0,<1.1.0',
     'isort>=4.3',
     'pydocstyle>=2.0.0',
     'pytest-cache>=1.0',
@@ -49,8 +45,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    'invenio-db>=1.0.0b9,<1.1.0',  # 'invenio-db==1.0.*',
-    'invenio-search>=1.0.0b4,<1.1.0',  # 'invenio-search==1.0.*',
+    'invenio-db>=1.0.0,<1.1.0',
+    'invenio-search>=1.0.0,<1.1.0',
     'pytest-flask>=0.10.0',
     'pytest>=3.3.0',
     'selenium>=3.7.0',
@@ -89,7 +85,7 @@ setup(
     setup_requires=setup_requires,
     tests_require=tests_require,
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Plugins',
         'Environment :: Web Environment',
         'Framework :: Pytest',

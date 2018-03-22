@@ -1,3 +1,10 @@
+..
+    This file is part of pytest-invenio.
+    Copyright (C) 2018 CERN.
+
+    pytest-invenio is free software; you can redistribute it and/or modify it
+    under the terms of the MIT License; see LICENSE file for more details.
+
 ================
  pytest-invenio
 ================
@@ -8,14 +15,8 @@
 .. image:: https://img.shields.io/coveralls/inveniosoftware/pytest-invenio.svg
         :target: https://coveralls.io/r/inveniosoftware/pytest-invenio
 
-.. image:: https://img.shields.io/github/tag/inveniosoftware/pytest-invenio.svg
-        :target: https://github.com/inveniosoftware/pytest-invenio/releases
-
-.. image:: https://img.shields.io/pypi/dm/pytest-invenio.svg
-        :target: https://pypi.python.org/pypi/pytest-invenio
-
-.. image:: https://img.shields.io/github/license/inveniosoftware/pytest-invenio.svg
-        :target: https://github.com/inveniosoftware/pytest-invenio/blob/master/LICENSE
+.. image:: https://img.shields.io/pypi/v/pytest-invenio.svg
+        :target: https://pypi.org/pypi/pytest-invenio
 
 Pytest fixtures for Invenio.
 
