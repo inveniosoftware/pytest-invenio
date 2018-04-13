@@ -309,7 +309,7 @@ def _es_create_indexes():
     try:
         list(current_search.create())
     except RequestError:
-        list(current_search.delete())
+        list(current_search.delete(ignore=[404]))
         list(current_search.create())
     current_search_client.indices.refresh()
 
