@@ -19,7 +19,6 @@ from datetime import datetime
 import pytest
 import sqlalchemy as sa
 from click.testing import CliRunner
-from elasticsearch.exceptions import RequestError
 from flask.cli import ScriptInfo
 from invenio_db import db as db_
 from invenio_search import current_search, current_search_client
@@ -306,6 +305,7 @@ def cli_runner(script_info):
 
 def _es_create_indexes():
     """Create all registered Elasticsearch indexes."""
+    from elasticsearch.exceptions import RequestError
     try:
         list(current_search.create())
     except RequestError:
