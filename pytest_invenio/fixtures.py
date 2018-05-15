@@ -99,7 +99,7 @@ def broker_uri():
 
 
 @pytest.fixture(scope='module')
-def celery_config():
+def celery_config(celery_config):
     """Celery configuration (defaults to eager tasks).
 
     Scope: module
@@ -118,12 +118,14 @@ def celery_config():
             celery_config['CELERY_ALWAYS_EAGER'] = False
             return celery_config
     """
-    return dict(
+
+    celery_config.update(dict(
         CELERY_ALWAYS_EAGER=True,
         CELERY_CACHE_BACKEND='memory',
         CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
         CELERY_RESULT_BACKEND='cache',
-    )
+    ))
+    return celery_config
 
 
 @pytest.fixture(scope='module')
