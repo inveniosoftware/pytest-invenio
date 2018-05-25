@@ -8,6 +8,8 @@
 Changes
 =======
 
-Version 0.1.0 (released TBD)
+Version 1.0.2 (released 2018-05-25)
 
-- Initial public release.
+Version 1.0.1 (released 2018-04-17)
+
+Version 1.0.0 (released 2018-03-22)
