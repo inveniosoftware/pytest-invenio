@@ -44,7 +44,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    'flask-celeryext>0.3.1',
+    'flask-celeryext>=0.3.1',
     'invenio-db>=1.0.0,<1.1.0',
     'invenio-search>=1.0.0,<1.1.0',
     'pytest-flask>=0.10.0',
