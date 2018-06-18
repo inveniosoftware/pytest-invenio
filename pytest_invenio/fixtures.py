@@ -2,6 +2,7 @@
 #
 # This file is part of pytest-invenio.
 # Copyright (C) 2017-2018 CERN.
+# Copyright (C) 2018 Esteban J. G. Garbancho.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -17,15 +18,8 @@ import tempfile
 from datetime import datetime
 
 import pytest
-import sqlalchemy as sa
-from click.testing import CliRunner
-from flask.cli import ScriptInfo
-from invenio_db import db as db_
-from invenio_search import current_search, current_search_client
 from pytest_flask.plugin import _make_test_response_class
 from selenium import webdriver
-from sqlalchemy_utils.functions import create_database, database_exists
-
 
 SCREENSHOT_SCRIPT = """import base64
 with open('screenshot.png', 'wb') as fp:
@@ -118,7 +112,6 @@ def celery_config(celery_config):
             celery_config['CELERY_ALWAYS_EAGER'] = False
             return celery_config
     """
-
     celery_config.update(dict(
         CELERY_ALWAYS_EAGER=True,
         CELERY_CACHE_BACKEND='memory',
@@ -285,6 +278,7 @@ def script_info(base_app):
             result = runner.invoke(mycmd, obj=script_info)
             assert result.exit_code == 0
     """
+    from flask.cli import ScriptInfo
     return ScriptInfo(create_app=lambda info: base_app)
 
 
@@ -300,12 +294,14 @@ def cli_runner(script_info):
             result = cli_runner(mycmd)
             assert result.exit_code == 0
     """
+    from click.testing import CliRunner
+
     def cli_invoke(command, input=None, *args):
         return CliRunner().invoke(command, args, input=input, obj=script_info)
     return cli_invoke
 
 
-def _es_create_indexes():
+def _es_create_indexes(current_search, current_search_client):
     """Create all registered Elasticsearch indexes."""
     from elasticsearch.exceptions import RequestError
     try:
@@ -316,7 +312,7 @@ def _es_create_indexes():
     current_search_client.indices.refresh()
 
 
-def _es_delete_indexes():
+def _es_delete_indexes(current_search):
     """Delete all registered Elasticsearch indexes."""
     list(current_search.delete(ignore=[404]))
 
@@ -332,9 +328,10 @@ def es(appctx):
     should used the function-scoped :py:data:`es_clear` fixture to leave the
     indexes clean for the following tests.
     """
-    _es_create_indexes()
+    from invenio_search import current_search, current_search_client
+    _es_create_indexes(current_search, current_search_client)
     yield current_search_client
-    _es_delete_indexes()
+    _es_delete_indexes(current_search)
 
 
 @pytest.fixture(scope='function')
@@ -346,9 +343,10 @@ def es_clear(es):
     This fixture rollback any changes performed to the indexes during a test,
     in order to leave Elasticsearch in a clean state for the next test.
     """
+    from invenio_search import current_search, current_search_client
     yield es
-    _es_delete_indexes()
-    _es_create_indexes()
+    _es_delete_indexes(current_search)
+    _es_create_indexes(current_search, current_search_client)
 
 
 @pytest.fixture(scope='module')
@@ -361,6 +359,8 @@ def database(appctx):
     instead. This fixture takes care of creating the database/tables and
     removing the tables once tests are done.
     """
+    from invenio_db import db as db_
+    from sqlalchemy_utils.functions import create_database, database_exists
     if not database_exists(str(db_.engine.url)):
         create_database(str(db_.engine.url))
     db_.create_all()
@@ -381,6 +381,7 @@ def db(database):
     fixture will set a save point and rollback all changes performed during
     the test (this is much faster than recreating the entire database).
     """
+    import sqlalchemy as sa
     connection = database.engine.connect()
     transaction = connection.begin()
 

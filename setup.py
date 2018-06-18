@@ -2,6 +2,7 @@
 #
 # This file is part of pytest-invenio.
 # Copyright (C) 2017-2018 CERN.
+# Copyright (C) 2018 Esteban J. G. Garbancho.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -18,9 +19,12 @@ history = open('CHANGES.rst').read()
 tests_require = [
     'check-manifest>=0.25',
     'coverage>=4.0',
-    'elasticsearch>=5.0.0,<6.0.0',
     'elasticsearch-dsl>=5.0.0,<6.0.0',
+    'elasticsearch>=5.0.0,<6.0.0',
+    'flask-celeryext>=0.3.1',
+    'invenio-db>=1.0.0,<1.1.0',
     'invenio-mail>=1.0.0,<1.1.0',
+    'invenio-search>=1.0.0,<1.1.0',
     'isort>=4.3',
     'pydocstyle>=2.0.0',
     'pytest-cov>=2.5.1',
@@ -44,9 +48,6 @@ setup_requires = [
 ]
 
 install_requires = [
-    'flask-celeryext>=0.3.1',
-    'invenio-db>=1.0.0,<1.1.0',
-    'invenio-search>=1.0.0,<1.1.0',
     'pytest-flask>=0.10.0',
     'pytest>=3.3.0',
     'selenium>=3.7.0',
