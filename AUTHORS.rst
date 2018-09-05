@@ -8,4 +8,7 @@
 Contributors
 ============
 
+- Alexander Ioannidis
+- Chiara Bigarella
+- Esteban J. G. Gabancho
 - Lars Holm Nielsen

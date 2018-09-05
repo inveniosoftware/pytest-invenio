@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 1.0.3 (released 2018-09-05)
+
+- Moves module dependent imports inside the fixture functions in order to
+  decouple dependencies for Invenio apps or modules that might not be using
+  them.
+
 Version 1.0.2 (released 2018-05-25)
 
 Version 1.0.1 (released 2018-04-17)
