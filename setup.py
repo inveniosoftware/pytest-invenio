@@ -49,7 +49,7 @@ setup_requires = [
 
 install_requires = [
     'pytest-flask>=0.10.0',
-    'pytest>=3.3.0',
+    'pytest>=3.8.0',
     'selenium>=3.7.0',
 ]
 
