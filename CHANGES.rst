@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.0.4 (released 2018-08-14)
+
+- Bumps pytest minimun version to 3.8.0.
+
 Version 1.0.3 (released 2018-09-05)
 
 - Moves module dependent imports inside the fixture functions in order to
