@@ -148,6 +148,7 @@ def app_config(db_uri, broker_uri, celery_config):
     return dict(
         APP_DEFAULT_SECURE_HEADERS=dict(
             force_https=False,
+            content_security_policy={'default-src': []}
         ),
         # Broker configuration
         BROKER_URL=broker_uri,
