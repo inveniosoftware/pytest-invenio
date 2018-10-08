@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.0.5 (released 2018-10-08)
+
+- Adds defaul Content Security Policy header to the app configuration.
+- Fixes issue with default tests scope.
+
 Version 1.0.4 (released 2018-08-14)
 
 - Bumps pytest minimun version to 3.8.0.
