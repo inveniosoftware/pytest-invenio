@@ -377,3 +377,15 @@ def test_browser(conftest_testdir, monkeypatch):
     assert os.path.exists(
         os.path.join(str(conftest_testdir.tmpdir), '.e2e_screenshots'))
     monkeypatch.undo()
+
+
+def test_celery_config(testdir):
+    """Test celery config."""
+    testdir.makepyfile(test_app="""
+        def test_celery_config_with_celery(celery_config):
+            assert celery_config['CELERY_ALWAYS_EAGER'] == True
+            assert celery_config['CELERY_CACHE_BACKEND'] == 'memory'
+            assert celery_config['CELERY_EAGER_PROPAGATES_EXCEPTIONS'] == True
+            assert celery_config['CELERY_RESULT_BACKEND'] == 'cache'
+    """)
+    testdir.runpytest().assert_outcomes(passed=1)
