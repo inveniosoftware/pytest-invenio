@@ -17,6 +17,7 @@ import shutil
 import tempfile
 from datetime import datetime
 
+import pkg_resources
 import pytest
 from pytest_flask.plugin import _make_test_response_class
 from selenium import webdriver
@@ -92,33 +93,59 @@ def broker_uri():
     yield os.environ.get('BROKER_URL', 'amqp://guest:guest@localhost:5672//')
 
 
-@pytest.fixture(scope='module')
-def celery_config(celery_config):
-    """Celery configuration (defaults to eager tasks).
+def _celery_config():
+    """Factory/Helper function to create the ``celery_config`` fixture.
 
-    Scope: module
-
-    This fixture provides the default Celery configuration (eager tasks,
-    in-memory result backend and exception propagation). It can easily be
-    overwritten in a specific test module:
-
-    .. code-block:: python
-
-        # test_something.py
-        import pytest
-
-        pytest.fixture(scope='module')
-        def celery_config(celery_config):
-            celery_config['CELERY_ALWAYS_EAGER'] = False
-            return celery_config
+    When Celery is installed it provides with this same fixture via
+    `celery.contrib.pytest
+    <https://github.com/celery/celery/blob/master/celery/contrib/pytest.py>`_,
+    in this is the case we overwrite this fixture and update the configuration
+    with Invenio's default configuration.
+    If it is not installed, then we just define a new fixture which returns the
+    default Invenio Celery configuration.
     """
-    celery_config.update(dict(
+    default_config = dict(
         CELERY_ALWAYS_EAGER=True,
         CELERY_CACHE_BACKEND='memory',
         CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
         CELERY_RESULT_BACKEND='cache',
-    ))
-    return celery_config
+    )
+
+    try:
+        pkg_resources.get_distribution('celery')
+
+        # Celery is installed, overwrite fixture
+        def inner(celery_config):
+            celery_config.update(default_config)
+            return celery_config
+    except pkg_resources.DistributionNotFound:
+        # No Celery, return the default config
+        def inner():
+            return default_config
+
+    return inner
+
+
+celery_config = pytest.fixture(
+    scope='module', name='celery_config')(_celery_config())
+"""Celery configuration (defaults to eager tasks).
+
+Scope: module
+
+This fixture provides the default Celery configuration (eager tasks,
+in-memory result backend and exception propagation). It can easily be
+overwritten in a specific test module:
+
+.. code-block:: python
+
+    # test_something.py
+    import pytest
+
+    pytest.fixture(scope='module')
+    def celery_config(celery_config):
+        celery_config['CELERY_ALWAYS_EAGER'] = False
+        return celery_config
+"""
 
 
 @pytest.fixture(scope='module')
