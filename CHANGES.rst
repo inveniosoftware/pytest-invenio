@@ -8,9 +8,13 @@
 Changes
 =======
 
+Version 1.0.6 (released 2018-12-03)
+
+- fixes overwriting of celery_config fixture
+
 Version 1.0.5 (released 2018-10-08)
 
-- Adds defaul Content Security Policy header to the app configuration.
+- Adds default Content Security Policy header to the app configuration.
 - Fixes issue with default tests scope.
 
 Version 1.0.4 (released 2018-08-14)
