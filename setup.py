@@ -31,7 +31,7 @@ tests_require = [
     'pydocstyle>=2.0.0',
     'pytest-cov>=2.5.1',
     'pytest-pep8>=1.0.6',
-    'urllib3>=1.21.1,<1.22'
+    'urllib3>=1.23'
 ]
 
 extras_require = {
