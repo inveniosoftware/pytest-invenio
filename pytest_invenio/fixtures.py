@@ -105,9 +105,9 @@ def _celery_config():
     default Invenio Celery configuration.
     """
     default_config = dict(
-        CELERY_ALWAYS_EAGER=True,
+        CELERY_TASK_ALWAYS_EAGER=True,
         CELERY_CACHE_BACKEND='memory',
-        CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+        CELERY_TASK_EAGER_PROPAGATES_EXCEPTIONS=True,
         CELERY_RESULT_BACKEND='cache',
     )
 
@@ -126,8 +126,8 @@ def _celery_config():
     return inner
 
 
-celery_config = pytest.fixture(
-    scope='module', name='celery_config')(_celery_config())
+celery_config_ext = pytest.fixture(
+    scope='module', name='celery_config_ext')(_celery_config())
 """Celery configuration (defaults to eager tasks).
 
 Scope: module
@@ -142,14 +142,14 @@ overwritten in a specific test module:
     import pytest
 
     pytest.fixture(scope='module')
-    def celery_config(celery_config):
-        celery_config['CELERY_ALWAYS_EAGER'] = False
-        return celery_config
+    def celery_config_ext(celery_config_ext):
+        celery_config_ext['CELERY_TASK_ALWAYS_EAGER'] = False
+        return celery_config_ext
 """
 
 
 @pytest.fixture(scope='module')
-def app_config(db_uri, broker_uri, celery_config):
+def app_config(db_uri, broker_uri, celery_config_ext):
     """Application configuration fixture.
 
     Scope: module
@@ -197,7 +197,7 @@ def app_config(db_uri, broker_uri, celery_config):
         # Disable CRSF protection in WTForms
         WTF_CSRF_ENABLED=False,
         # Celery configuration
-        **celery_config
+        **celery_config_ext
     )
 
 

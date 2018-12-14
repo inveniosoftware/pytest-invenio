@@ -86,7 +86,7 @@ def test_app_config(testdir):
             assert app_config['SQLALCHEMY_DATABASE_URI'] == db_uri
             assert app_config['BROKER_URL'] == broker_uri
             assert app_config['SECRET_KEY'] == 'test-secret-key'
-            assert app_config['CELERY_ALWAYS_EAGER'] == True
+            assert app_config['CELERY_TASK_ALWAYS_EAGER'] == True
     """)
     # Test that application fixture can be overwritten in each module.
     testdir.makepyfile(test_app_overwrite="""
@@ -379,13 +379,14 @@ def test_browser(conftest_testdir, monkeypatch):
     monkeypatch.undo()
 
 
-def test_celery_config(testdir):
+def test_celery_config_ext(testdir):
     """Test celery config."""
     testdir.makepyfile(test_app="""
-        def test_celery_config_with_celery(celery_config):
-            assert celery_config['CELERY_ALWAYS_EAGER'] == True
-            assert celery_config['CELERY_CACHE_BACKEND'] == 'memory'
-            assert celery_config['CELERY_EAGER_PROPAGATES_EXCEPTIONS'] == True
-            assert celery_config['CELERY_RESULT_BACKEND'] == 'cache'
+        def test_celery_config_with_celery(celery_config_ext):
+            assert celery_config_ext['CELERY_TASK_ALWAYS_EAGER'] == True
+            assert celery_config_ext['CELERY_CACHE_BACKEND'] == 'memory'
+            assert celery_config_ext[
+            'CELERY_TASK_EAGER_PROPAGATES_EXCEPTIONS'] == True
+            assert celery_config_ext['CELERY_RESULT_BACKEND'] == 'cache'
     """)
     testdir.runpytest().assert_outcomes(passed=1)
