@@ -8,9 +8,14 @@
 Changes
 =======
 
+Version 1.1.0 (released 2019-02-15)
+
+- Changes name of fixture from celery_config to celery_config_ext due to
+  unreliable overwriting of celery_config fixture name.
+
 Version 1.0.6 (released 2018-12-03)
 
-- fixes overwriting of celery_config fixture
+- Fixes overwriting of celery_config fixture
 
 Version 1.0.5 (released 2018-10-08)
 

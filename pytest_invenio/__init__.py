@@ -226,7 +226,7 @@ Customizing configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 The application fixtures rely on fixtures such as
 :py:data:`~fixtures.instance_path`, :py:data:`~fixtures.app_config`,
-:py:data:`~fixtures.celery_config`, :py:data:`~fixtures.db_uri`,
+:py:data:`~fixtures.celery_config_ext`, :py:data:`~fixtures.db_uri`,
 :py:data:`~fixtures.broker_uri` to inject configuration into the
 application.
 
