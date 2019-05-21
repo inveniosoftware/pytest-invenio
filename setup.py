@@ -29,7 +29,6 @@ tests_require = [
     'invenio-search>=1.0.0,<1.1.0',
     'isort>=4.3',
     'pydocstyle>=2.0.0',
-    'pytest-cov>=2.5.1',
     'pytest-pep8>=1.0.6',
     'urllib3>=1.23'
 ]
@@ -52,6 +51,7 @@ setup_requires = [
 install_requires = [
     'pytest-flask>=0.10.0',
     'pytest>=3.8.1',
+    'pytest-cov>=2.5.1',
     'selenium>=3.7.0',
 ]
 
