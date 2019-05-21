@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.1.1 (released 2019-05-21)
+
+- Adds pytest-cov as install dependency.
+
 Version 1.1.0 (released 2019-02-15)
 
 - Changes name of fixture from celery_config to celery_config_ext due to
