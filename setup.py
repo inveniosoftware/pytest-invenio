@@ -25,17 +25,19 @@ tests_require = [
     'elasticsearch>=5.0.0,<6.0.0',
     'flask-celeryext>=0.3.1',
     'invenio-db>=1.0.0,<1.1.0',
+    'invenio-files-rest>=1.0.0',
     'invenio-mail>=1.0.0,<1.1.0',
     'invenio-search>=1.0.0,<1.1.0',
     'isort>=4.3',
     'pydocstyle>=2.0.0',
     'pytest-pep8>=1.0.6',
+    'six>=1.12.0',
     'urllib3>=1.23'
 ]
 
 extras_require = {
     'docs': [
-        'Sphinx>=1.5.1',
+        'Sphinx>=1.8.0',
     ],
     'tests': tests_require,
 }

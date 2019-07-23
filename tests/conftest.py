@@ -26,6 +26,7 @@ def conftest_testdir(testdir):
         from invenio_db import InvenioDB
         from invenio_mail import InvenioMail
         from invenio_search import InvenioSearch
+        from invenio_files_rest import InvenioFilesREST
 
         def _factory(name, **config):
             app_ = Flask(name)
@@ -33,6 +34,7 @@ def conftest_testdir(testdir):
             InvenioDB(app_)
             InvenioSearch(app_)
             InvenioMail(app_)
+            InvenioFilesREST(app_)
 
             @app_.route('/')
             def index():
