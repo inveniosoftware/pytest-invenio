@@ -554,3 +554,38 @@ def _get_screenshots_dir():
     if not os.path.exists(directory):
         os.makedirs(directory)
     return directory
+
+
+@pytest.yield_fixture(scope='function')
+def location(db):
+    """Sets up simple location"""
+    from invenio_files_rest.models import Location
+    uri = tempfile.mkdtemp()
+    location_obj = Location(name="pytest-location", uri=uri, default=True)
+
+    db.session.add(location_obj)
+    db.session.commit()
+
+    yield location_obj
+
+    shutil.rmtree(location_obj.uri)
+
+
+@pytest.fixture(scope="function")
+def bucket_from_dir(db, location):
+    """Creates bucket from provided directory"""
+    def create_bucket_from_dir(source_dir, location_obj=None):
+        if not location_obj:
+            from invenio_files_rest.models import Bucket, Location, \
+                ObjectVersion
+            location_obj = Location.get_default() or location
+        bucket_obj = Bucket.create(location_obj)
+        for file_name in os.listdir(source_dir):
+            full_file_path = os.path.join(source_dir, file_name)
+            if os.path.isdir(full_file_path):
+                continue
+            file_obj = open(full_file_path, 'rb')
+            ObjectVersion.create(bucket_obj, key=file_name, stream=file_obj)
+        db.session.commit()
+        return bucket_obj
+    return create_bucket_from_dir

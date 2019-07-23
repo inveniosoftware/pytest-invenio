@@ -390,3 +390,43 @@ def test_celery_config_ext(testdir):
             assert celery_config_ext['CELERY_RESULT_BACKEND'] == 'cache'
     """)
     testdir.runpytest().assert_outcomes(passed=1)
+
+
+def test_default_location(conftest_testdir):
+    conftest_testdir.makepyfile("""
+        from invenio_files_rest.models import Bucket
+
+        def test_default_location_create(location):
+            new_bucket = Bucket.create(location)
+            assert location.name == "pytest-location"
+            assert location.uri is not None
+            assert new_bucket.location == location
+    """)
+    conftest_testdir.runpytest().assert_outcomes(passed=1)
+
+
+def test_bucket_from_dir(conftest_testdir):
+    conftest_testdir.makepyfile("""
+        import tempfile, os
+        import six
+        from invenio_files_rest.models import ObjectVersion
+
+        def test_creating_location_and_use_bucket_from_dir(bucket_from_dir):
+            # Create dir with a file
+            dir_for_files = tempfile.mkdtemp()
+            with open(
+                os.path.join(dir_for_files, 'output_file'),
+                'wb'
+            ) as file_out:
+                file_out.write(six.b('a'*1024))
+            # load file to bucket
+            bucket = bucket_from_dir(dir_for_files)
+
+            # Get all files from bucket
+            files_from_bucket = ObjectVersion.get_by_bucket(bucket)
+            # Check if there is only one file
+            assert files_from_bucket.count() == 1
+            # And check if this file has proper key
+            assert files_from_bucket.one().key == "output_file"
+    """)
+    conftest_testdir.runpytest().assert_outcomes(passed=1)
