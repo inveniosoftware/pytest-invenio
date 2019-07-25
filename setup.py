@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of pytest-invenio.
-# Copyright (C) 2017-2018 CERN.
+# Copyright (C) 2017-2019 CERN.
 # Copyright (C) 2018 Esteban J. G. Garbancho.
 # Copyright (C) 2018 Northwestern University, Feinberg School of Medicine,
 # Galter Health Sciences Library.
@@ -32,7 +32,9 @@ tests_require = [
     'pydocstyle>=2.0.0',
     'pytest-pep8>=1.0.6',
     'six>=1.12.0',
-    'urllib3>=1.23'
+    'urllib3>=1.23,<1.25',
+    'invenio-cache>=1.0.0',
+    'redis>=3.0.0'
 ]
 
 extras_require = {

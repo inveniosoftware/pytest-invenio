@@ -31,7 +31,7 @@ cache:
 env:
   global:
     - E2E_OUTPUT=base64
-    - ES_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.4.tar.gz
+    - DOCKER_COMPOSE_VERSION=1.24.1
   matrix:
     - REQUIREMENTS=lowest
     - REQUIREMENTS=release DEPLOY=true
@@ -42,10 +42,11 @@ python:
   - "3.5"
 
 before_install:
-  # Download and start ES
-  - "mkdir /tmp/elasticsearch"
-  - "wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1"
-  - "/tmp/elasticsearch/bin/elasticsearch &"
+  # Install docker-compose and start Elasticsearch + Redis
+  - "sudo rm /usr/local/bin/docker-compose"
+  - "curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose"
+  - "chmod +x docker-compose"
+  - "sudo mv docker-compose /usr/local/bin"
   # Chrome webdriver for Selenium
   - "PATH=$PATH:$HOME/webdrivers"
   - "if [ ! -f $HOME/webdrivers/chromedriver ]; then wget https://chromedriver.storage.googleapis.com/2.31/chromedriver_linux64.zip -P $HOME/webdrivers; unzip -d $HOME/webdrivers $HOME/webdrivers/chromedriver_linux64.zip; fi"
@@ -59,6 +60,8 @@ before_install:
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
   - "travis_retry pip install -e .[all]"
+  - "docker-compose up -d"
+  - "docker-compose exec redis redis-cli ping"
 
 before_script:
   # https://docs.travis-ci.com/user/gui-and-headless-browsers/

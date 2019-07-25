@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of pytest-invenio.
-# Copyright (C) 2017-2018 CERN.
+# Copyright (C) 2017-2019 CERN.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -23,6 +23,7 @@ def conftest_testdir(testdir):
 
         from flask import Flask, jsonify, current_app
         from functools import partial
+        from invenio_cache import InvenioCache
         from invenio_db import InvenioDB
         from invenio_mail import InvenioMail
         from invenio_search import InvenioSearch
@@ -31,6 +32,7 @@ def conftest_testdir(testdir):
         def _factory(name, **config):
             app_ = Flask(name)
             app_.config.update(**config)
+            InvenioCache(app_)
             InvenioDB(app_)
             InvenioSearch(app_)
             InvenioMail(app_)

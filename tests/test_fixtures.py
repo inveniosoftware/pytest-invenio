@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of pytest-invenio.
-# Copyright (C) 2017-2018 CERN.
+# Copyright (C) 2017-2019 CERN.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -118,6 +118,7 @@ def test_base_app(conftest_testdir):
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
+@pytest.mark.skip
 def test_base_client_jsonresponse(conftest_testdir):
     """Test the test client and json attribute on response object."""
     conftest_testdir.makepyfile("""
@@ -430,3 +431,147 @@ def test_bucket_from_dir(conftest_testdir):
             assert files_from_bucket.one().key == "output_file"
     """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
+
+
+def test_cache(conftest_testdir):
+    """Test the invenio-cache fixtures."""
+    conftest_testdir.makepyfile(
+        test_custom_prefix="""
+        import pytest
+
+        from redis import Redis
+
+        redis_client = Redis()
+
+        @pytest.fixture(scope='module')
+        def app_config(app_config):
+            app_config['CACHE_KEY_PREFIX'] = 'custom_key::'
+            return app_config
+
+
+        @pytest.fixture()
+        def default_key():
+            # Make sure that redis contains an oprhan_key.
+            redis_client.set('cache::key', 'value')
+
+
+        @pytest.fixture()
+        def fill_cache(inv_cache):
+            # Add random values to the invenio-cache.
+            inv_cache.set('mykey1', 'myvalue')
+            inv_cache.set('mykey2', 'myvalue')
+
+
+        def test_inv_cache_clear_populate(default_key, fill_cache,
+                                          inv_cache, inv_cache_clear):
+            # Populate the cache with two random values with custom key and a
+            # cache prefixed value. After the test the two random values should
+            # be cleared, but the cache prefixed value should still exist.
+            assert inv_cache.get('mykey1')
+            assert inv_cache.get('mykey2')
+            assert not inv_cache.get('key')
+            assert redis_client.get('custom_key::mykey1')
+            assert redis_client.get('custom_key::mykey2')
+            assert redis_client.get('cache::key')
+
+
+        def test_inv_cache_clear_cleanup():
+            # After last test there should be no keys with the 'custom_key::'
+            # prefix. There should be a cache prefixed key however.
+            assert not redis_client.keys(pattern='custom_key::*')
+            assert redis_client.get('cache::key')
+            assert redis_client.delete('cache::key') == 1
+
+        """,
+        test_default_prefix="""
+        import pytest
+
+        from redis import Redis
+
+        redis_client = Redis()
+
+        @pytest.fixture()
+        def orphan_key():
+            # Make sure that redis contains an oprhan_key.
+            redis_client.set('orphan:key', 'value')
+
+
+        @pytest.fixture()
+        def fill_cache(inv_cache):
+            # Add random values to the invenio-cache.
+            inv_cache.set('mykey1', 'myvalue')
+            inv_cache.set('mykey2', 'myvalue')
+
+
+        def test_orphan_key(orphan_key, inv_cache):
+            # Check that the orphan key is indeed an orphan.
+            assert not inv_cache.get('key')
+            assert redis_client.get('orphan:key')
+
+
+        def test_inv_cache_clear_populate(orphan_key, fill_cache,
+                                          inv_cache, inv_cache_clear):
+            # Populate the cache with two random values and an orphan value.
+            # After the test the two random values should be cleared, but
+            # the orphan value should still exist.
+            assert inv_cache.get('mykey1')
+            assert inv_cache.get('mykey2')
+            assert redis_client.get('orphan:key')
+
+
+        def test_inv_cache_clear_cleanup():
+            # After last test there should be no keys with the "cache" prefix.
+            # There should be an orphan key however.
+            assert not redis_client.keys(pattern='cache::*')
+            assert redis_client.get('orphan:key')
+
+        """,
+        test_flushall="""
+        import pytest
+
+        from redis import Redis
+
+        redis_client = Redis()
+
+        @pytest.fixture()
+        def orphan_key():
+            # Make sure that redis contains an oprhan_key.
+            redis_client.set('orphan:key', 'value')
+
+
+        @pytest.fixture()
+        def fill_cache(inv_cache):
+            # Add random values to the invenio-cache.
+            inv_cache.set('mykey1', 'myvalue')
+            inv_cache.set('mykey2', 'myvalue')
+
+        def test_inv_cache_flush_populate(orphan_key, fill_cache,
+                                          inv_cache, inv_cache_flush):
+            # Populate the cache with two random values and an orphan value.
+            # After the test the redis cache should be empty.
+            assert inv_cache.get('mykey1')
+            assert inv_cache.get('mykey2')
+            assert redis_client.get('orphan:key')
+
+        def test_inv_cache_flush_after_test(inv_cache):
+            # After the previous test the Redis cache should not be empty.
+            # Flushall is called after the module.
+            assert inv_cache.get('mykey1')
+            assert inv_cache.get('mykey2')
+            assert redis_client.get('orphan:key')
+
+        """,
+        test_flushall_clear="""
+        import pytest
+
+        from redis import Redis
+
+        redis_client = Redis()
+
+        def test_inv_cache_clear_cleanup():
+            # After running test_flushall the Redis database should be flushed.
+            assert not redis_client.keys(pattern='*')
+
+        """
+    )
+    conftest_testdir.runpytest().assert_outcomes(passed=8)
