@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.2.0 (released 2019-07-31)
+
+- Adds fixture for creating default Location.
+- Adds fixture for creating Bucket from directory with files.
+
 Version 1.1.1 (released 2019-05-21)
 
 - Adds pytest-cov as install dependency.
