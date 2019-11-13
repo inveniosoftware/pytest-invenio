@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.2.1 (released 2019-11-13)
+
+- Fixes instance path fixture to also set the static folder.
+
 Version 1.2.0 (released 2019-07-31)
 
 - Adds fixture for creating default Location.
