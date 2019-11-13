@@ -26,8 +26,8 @@ import pytest
 
 from .fixtures import _monkeypatch_response_class, app, app_config, appctx, \
     base_app, base_client, broker_uri, browser, bucket_from_dir, \
-    celery_config_ext, cli_runner, database, db, db_uri, default_handler, \
-    es, es_clear, instance_path, location, mailbox, script_info
+    celery_config_ext, cli_runner, database, db, db_uri, default_handler, es, \
+    es_clear, instance_path, location, mailbox, script_info
 
 
 def pytest_generate_tests(metafunc):
