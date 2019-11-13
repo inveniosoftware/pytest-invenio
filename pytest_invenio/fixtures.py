@@ -14,6 +14,7 @@ from __future__ import absolute_import, print_function
 import json
 import os
 import shutil
+import sys
 import tempfile
 from datetime import datetime
 
@@ -57,6 +58,7 @@ def instance_path():
     path = tempfile.mkdtemp()
     os.environ.update(
         INVENIO_INSTANCE_PATH=os.environ.get('INSTANCE_PATH', path),
+        INVENIO_STATIC_FOLDER=os.path.join(sys.prefix, 'var/instance/static'),
     )
     yield path
     os.environ.pop('INVENIO_INSTANCE_PATH', None)
@@ -558,7 +560,7 @@ def _get_screenshots_dir():
 
 @pytest.yield_fixture(scope='function')
 def location(db):
-    """Sets up simple location"""
+    """Sets up simple location."""
     from invenio_files_rest.models import Location
     uri = tempfile.mkdtemp()
     location_obj = Location(name="pytest-location", uri=uri, default=True)
@@ -573,7 +575,7 @@ def location(db):
 
 @pytest.fixture(scope="function")
 def bucket_from_dir(db, location):
-    """Creates bucket from provided directory"""
+    """Creates bucket from provided directory."""
     def create_bucket_from_dir(source_dir, location_obj=None):
         if not location_obj:
             from invenio_files_rest.models import Bucket, Location, \
