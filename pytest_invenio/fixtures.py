@@ -560,7 +560,15 @@ def _get_screenshots_dir():
 
 @pytest.yield_fixture(scope='function')
 def location(db):
-    """Sets up simple location."""
+    """Creates a simple default location for a test.
+
+    Scope: function
+
+    Use this fixture if your test requires a `files location <https://invenio-
+    files-rest.readthedocs.io/en/latest/api.html#invenio_files_rest.models.
+    Location>`_. The location will be a default location with the name
+    ``pytest-location``.
+    """
     from invenio_files_rest.models import Location
     uri = tempfile.mkdtemp()
     location_obj = Location(name="pytest-location", uri=uri, default=True)
@@ -575,8 +583,42 @@ def location(db):
 
 @pytest.fixture(scope="function")
 def bucket_from_dir(db, location):
-    """Creates bucket from provided directory."""
+    '''Creates a bucket from the specified directory.
+
+    Scope: function
+
+    Use this fixture if your test requires a `files bucket <https://invenio-
+    files-rest.readthedocs.io/en/latest/api.html#invenio_files_rest.models.
+    Bucket>`_. The ``bucket_from_dir`` fixture returns a function with the
+    following signature:
+
+    .. code-block:: python
+
+        def create_bucket_from_dir(source_dir, location_obj=None):
+            """Create bucket from the specified source directory.
+
+            :param source_dir: The directory to create the bucket from.
+            :param location_obj: Optional location object to use. If None
+                is specified, get the current default location.
+            :returns: The new bucket object.
+            """
+
+    Below is an example of how to use the ``bucket_from_dir`` fixture:
+
+    .. code-block:: python
+
+        def test_with_bucket(bucket_from_dir):
+            bucket = bucket_from_dir('/my/directory/path')
+            # ... use the bucket for your test
+    '''
     def create_bucket_from_dir(source_dir, location_obj=None):
+        """Create bucket from the specified source directory.
+
+        :param source_dir: The directory to create the bucket from.
+        :param location_obj: Optional location object to use. If None
+            is specified, get the current default location.
+        :returns: The new bucket object.
+        """
         if not location_obj:
             from invenio_files_rest.models import Bucket, Location, \
                 ObjectVersion
