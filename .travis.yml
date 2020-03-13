@@ -8,15 +8,13 @@
 
 addons:
   chrome: stable # https://docs.travis-ci.com/user/chrome
-
-dist: trusty # Chrome driver fails if not trusty dist
+  apt:
+    packages:
+      - xvfb
+      - chromium-chromedriver
 
 notifications:
   email: false
-
-# Chrome Webdriver fails if not on sudo
-# See https://github.com/travis-ci/travis-ci/issues/8836
-sudo: true
 
 language: python
 
@@ -28,18 +26,21 @@ matrix:
 cache:
   - pip
 
+services:
+  - xvfb
+
 env:
   global:
     - E2E_OUTPUT=base64
-    - ES_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.4.tar.gz
+    - ES_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.2.tar.gz
   matrix:
     - REQUIREMENTS=lowest
     - REQUIREMENTS=release DEPLOY=true
     - REQUIREMENTS=devel
 
 python:
-  - "2.7"
-  - "3.5"
+  - "3.6"
+  - "3.7"
 
 before_install:
   # Download and start ES
@@ -60,13 +61,6 @@ install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
   - "travis_retry pip install -e .[all]"
 
-before_script:
-  # https://docs.travis-ci.com/user/gui-and-headless-browsers/
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  # Allow ES and xvfb to start
-  - "sleep 10"
-
 script:
   - "./run-tests.sh"
 
@@ -81,6 +75,6 @@ deploy:
   distributions: sdist bdist_wheel
   on:
     condition: $DEPLOY = true
-    python: '3.5'
+    python: '3.6'
     repo: inveniosoftware/pytest-invenio
     tags: true

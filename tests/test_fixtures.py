@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, print_function
 
+import json
 import os
 
 import pytest
@@ -217,13 +218,11 @@ def test_es_clear(conftest_testdir):
     """Test Elasticsearch clearing."""
     # Create an Elasticsearch mapping for Invenio-Search
     conftest_testdir.mkpydir('data')
-    conftest_testdir.mkpydir('data/v5')
-    conftest_testdir.mkdir('data/v5/demo')
-    with open('data/v5/demo/default-v1.0.0.json', 'w') as fp:
-        fp.write("""{"mappings": { "example": { "properties": { "title": {
-            "type": "string",
-            "fielddata": true
-        }}}}}""")
+    conftest_testdir.mkpydir('data/v6')
+    conftest_testdir.mkdir('data/v6/demo')
+    with open('data/v6/demo/default-v1.0.0.json', 'w') as fp:
+        fp.write(json.dumps({"mappings": {"_doc": {"properties": {
+            "title": {"type": "text", "fielddata": True}}}}}))
     # Create test
     conftest_testdir.makepyfile("""
         import pytest
@@ -244,10 +243,10 @@ def test_es_clear(conftest_testdir):
             # Index a document
             current_search_client.index(
                 index='demo-default-v1.0.0',
-                doc_type='demo-default-v1.0.0',
                 id=doc_id,
                 body={'title': 'Test'},
                 op_type='create',
+                doc_type='_doc',
             )
             # Wait for document to be available
             current_search.flush_and_refresh('demo-default-v1.0.0')
@@ -255,6 +254,7 @@ def test_es_clear(conftest_testdir):
             current_search_client.get(
                 index='demo-default-v1.0.0',
                 id=doc_id,
+                doc_type='_doc',
             )
 
         def test_es2(es):
@@ -264,6 +264,7 @@ def test_es_clear(conftest_testdir):
                 current_search_client.get,
                 index='demo-default-v1.0.0',
                 id=doc_id,
+                doc_type='_doc',
             )
             # But the index should exist
             assert current_search_client.indices.exists(
