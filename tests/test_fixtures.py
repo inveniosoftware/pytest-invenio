@@ -25,15 +25,20 @@ def test_version():
 def test_instance_path(testdir):
     """Test instance path."""
     assert 'INVENIO_INSTANCE_PATH' not in os.environ
+    assert 'INVENIO_STATIC_FOLDER' not in os.environ
+
     testdir.makepyfile("""
         import os
         def test_instance_path(instance_path):
             assert os.environ['INVENIO_INSTANCE_PATH'] == instance_path
+            assert os.environ['INVENIO_STATIC_FOLDER'] == os.path.join(
+                instance_path, 'static')
             assert os.path.exists(instance_path)
             assert os.path.isdir(instance_path)
     """)
     testdir.runpytest().assert_outcomes(passed=1)
     assert 'INVENIO_INSTANCE_PATH' not in os.environ
+    assert 'INVENIO_STATIC_FOLDER' not in os.environ
 
 
 def test_db_uri(testdir):

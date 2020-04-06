@@ -56,12 +56,14 @@ def instance_path():
     removed.
     """
     path = tempfile.mkdtemp()
+    env_instance_path = os.environ.get('INVENIO_INSTANCE_PATH', path)
     os.environ.update(
-        INVENIO_INSTANCE_PATH=os.environ.get('INSTANCE_PATH', path),
-        INVENIO_STATIC_FOLDER=os.path.join(sys.prefix, 'var/instance/static'),
+        INVENIO_INSTANCE_PATH=env_instance_path,
+        INVENIO_STATIC_FOLDER=os.path.join(env_instance_path, 'static'),
     )
     yield path
     os.environ.pop('INVENIO_INSTANCE_PATH', None)
+    os.environ.pop('INVENIO_STATIC_FOLDER', None)
     shutil.rmtree(path)
 
 
