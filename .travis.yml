@@ -60,6 +60,10 @@ before_install:
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
   - "travis_retry pip install -e .[all]"
+  # Uninstall numpy (present by default in Travis/Python workers)
+  # as it causes side effects with elasticsearch-py
+  - pip uninstall numpy -y
+  - pip freeze
 
 script:
   - "./run-tests.sh"
