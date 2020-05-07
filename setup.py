@@ -55,6 +55,7 @@ install_requires = [
     'pytest>=3.8.1',
     'pytest-cov>=2.5.1',
     'selenium>=3.7.0',
+    'werkzeug>=0.14.1,<1.0.0',
 ]
 
 packages = find_packages()
