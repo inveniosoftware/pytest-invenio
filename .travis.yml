@@ -38,8 +38,7 @@ env:
     - REQUIREMENTS=devel
 
 python:
-  - "2.7"
-  - "3.5"
+  - "3.6"
 
 before_install:
   # Download and start ES
@@ -83,8 +82,6 @@ deploy:
   password:
     secure: "UES49TwCHOmAsSx/cuUfzWa8nrUuTtXHz/RCgz2gx1svZWavfRyNwr4E/9u9iyETUcN1n1qPwq32dFlm+nBCHI6uAHgIeVJConaNqYxp8/fAsZfLwD9CBe/K4V7nGUxeHjgkJmg3mPAkVAwHSusRZtcyvIx1CMrVc5WPh8E7H0XlHB7lw7CZ0CrShccq+uw1EwP8yXfOJrWjfY5NfIz7avNxbk0Rmxnj/ucqxI4GE6Ex19ra7w9RlQkfu7s17Ma/QYMI5JdZ29FQfUV1TV4ZHymaH+Vql85BMYxEk83pQKVx65pcoAZt28LrrzPs0kmLNVtWJbmjud26YBeLrAK3Ks2GsuNqMQFjcO1yUEdsHKbQ8cQE9n9Ifo0xYRwjx1C3kfIqUtBmeYY1M8n5sobpHECizhFtDmSFuO+Y0zSgvGgAW831jvWmIZHfspKI0Xek3KGikcvtZR4dL8WAmdF7jFrjx4cDzzhbSFO+4mHEP6DT+L7LGhxL8XnDSMjekrP3w0sPstbCL5iKcboiqi1xOud7Lxvme0mDrVze+D5kIO7V3it3coZ3Pe5LI36p9rzYSPJfRCy8tMRie8BEQP3sqOdyadWJnywJIxhSJp0SD7l2vtP9uLWuW7+97JWaGGdEHLeQHpu1x8pNf0CTEtWTKnlAykM5z6/wyPnUkBMm/Kk="
   distributions: sdist bdist_wheel
+  skip_existing: true
   on:
-    condition: $DEPLOY = true
-    python: '3.5'
-    repo: inveniosoftware/pytest-invenio
     tags: true
