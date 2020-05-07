@@ -20,19 +20,20 @@ history = open('CHANGES.rst').read()
 
 tests_require = [
     'check-manifest>=0.25',
-    'coverage>=4.0',
+    'coverage>=4.1',
     'elasticsearch-dsl>=5.0.0,<6.0.0',
     'elasticsearch>=5.0.0,<6.0.0',
     'flask-celeryext>=0.3.1',
     'invenio-db>=1.0.0,<1.1.0',
     'invenio-files-rest>=1.0.0',
     'invenio-mail>=1.0.0,<1.1.0',
-    'invenio-search>=1.0.0,<1.1.0',
+    'invenio-search>=1.2.3,<1.3.0',
+    'invenio-rest>=1.1.2,<1.2.0',
     'isort>=4.3',
     'pydocstyle>=2.0.0',
     'pytest-pep8>=1.0.6',
     'six>=1.12.0',
-    'urllib3>=1.23'
+    'urllib3>=1.23',
 ]
 
 extras_require = {
@@ -51,7 +52,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    'pytest-flask>=0.10.0',
+    'Flask>=1.0.4,<1.1.0',
+    'pytest-flask>=0.10.0,<1.0.0',
     'pytest>=3.8.1',
     'pytest-cov>=2.5.1',
     'selenium>=3.7.0',
