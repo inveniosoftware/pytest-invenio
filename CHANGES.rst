@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.3.1 (released 2020-05-12)
+
+- Uninstalls numpy in Travis due to incompatibilities with
+  elasticsearch-py.
+
 Version 1.3.0 (released 2020-03-19)
 
 - Removes support for Python 2.7.
