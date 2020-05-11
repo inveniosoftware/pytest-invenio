@@ -12,6 +12,16 @@ Version 1.3.0 (released 2020-03-19)
 
 - Removes support for Python 2.7.
 
+Version 1.2.2 (released 2020-05-07)
+
+- Uninstalls numpy in Travis due to incompatibilities with
+  elasticsearch-py.
+- Deprecated Python versions lower than 3.6.0. Now supporting 3.6.0.
+- Set maximum version of Werkzeug to 1.0.0 due to incompatible imports.
+- Set maximum version of Flask to 1.1.0 due to incompatible imports.
+- Set maximum version of Pytest-Flask to 1.0.0 due to breaking changes.
+- Set minimum version of Invenio-Search to 1.2.3 and maximum to 1.3.0.
+
 Version 1.2.1 (released 2019-11-13)
 
 - Fixes instance path fixture to also set the static folder.
