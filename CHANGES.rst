@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 1.3.2 (released 2020-05-19)
+
+- Move check-manifest, coverage, isort, pydocstyle, pytest-flask and
+  pytest-pep8 from test to install requirements to provide them as centrally
+  managed dependencies.
+
 Version 1.3.1 (released 2020-05-12)
 
 - Uninstalls numpy in Travis due to incompatibilities with
