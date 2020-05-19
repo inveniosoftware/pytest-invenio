@@ -19,9 +19,6 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
-    'check-manifest>=0.25',
-    # coverage pinned because of https://github.com/nedbat/coveragepy/issues/716
-    'coverage>=4.0,<5.0.0',
     'elasticsearch-dsl>=6.0.0,<7.0.0',
     'elasticsearch>=6.0.0,<7.0.0',
     'invenio-celery>=1.2.0',
@@ -29,9 +26,6 @@ tests_require = [
     'invenio-files-rest>=1.1.1',
     'invenio-mail>=1.0.0,<1.1.0',
     'invenio-search>=1.2.3,<1.3.0',
-    'isort>=4.3',
-    'pydocstyle>=2.0.0',
-    'pytest-pep8>=1.0.6',
     'six>=1.12.0',
     'urllib3>=1.23'
 ]
@@ -54,9 +48,15 @@ setup_requires = [
 install_requires = [
     # pinned because of change of fixture scope in pytest-flask v1.0.0
     # live_server
-    'pytest-flask>=0.15.1,<1.0.0',
+    'check-manifest>=0.25',
+    # coverage pinned because of https://github.com/nedbat/coveragepy/issues/716
+    'coverage>=4.0,<5.0.0',
+    'isort>=4.3',
+    'pydocstyle>=2.0.0',
     'pytest>=4.6.1',
     'pytest-cov>=2.5.1',
+    'pytest-flask>=0.15.1,<1.0.0',
+    'pytest-pep8>=1.0.6',
     'selenium>=3.7.0',
 ]
 
