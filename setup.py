@@ -51,7 +51,7 @@ install_requires = [
     'check-manifest>=0.25',
     # coverage pinned because of https://github.com/nedbat/coveragepy/issues/716
     'coverage>=4.0,<5.0.0',
-    'isort>=4.3',
+    'isort>=5.0',
     'pydocstyle>=2.0.0',
     'pytest>=4.6.1',
     'pytest-cov>=2.5.1',
