@@ -51,6 +51,7 @@ install_requires = [
     'check-manifest>=0.25',
     # coverage pinned because of https://github.com/nedbat/coveragepy/issues/716
     'coverage>=4.0,<5.0.0',
+    'docker-services-cli>=0.1.0',
     'isort>=4.3',
     'pydocstyle>=2.0.0',
     'pytest>=4.6.1',
