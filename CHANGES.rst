@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.3.3 (released 2020-08-27)
+
+- Add `docker-services-cli` as dependency to enable Invenio modules to
+  perform reproducible tests.
+
 Version 1.3.2 (released 2020-05-19)
 
 - Move check-manifest, coverage, isort, pydocstyle, pytest-flask and
