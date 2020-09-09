@@ -431,3 +431,60 @@ def test_bucket_from_dir(conftest_testdir):
             assert files_from_bucket.one().key == "output_file"
     """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
+
+
+def test_entrypoint(testdir):
+    """Test database creation and initialization."""
+    testdir.makeconftest("""
+        import pytest
+
+        from flask import Flask
+        from functools import partial
+        from invenio_db import InvenioDB
+
+        def _factory(name, **config):
+            app_ = Flask(name)
+            app_.config.update(**config)
+            InvenioDB(app_)
+            return app_
+
+        @pytest.fixture(scope='module')
+        def create_app(entry_points):
+            return partial(_factory, 'app')
+    """)
+    testdir.makepyfile(mock_module="""
+        from invenio_db import db
+        from pkg_resources import iter_entry_points
+
+        class Place(db.Model):
+            id = db.Column(db.Integer, primary_key=True)
+
+        def db_entry_points():
+            return iter_entry_points('invenio_db.models')
+    """)
+    testdir.makepyfile(test_ep="""
+        import pytest
+        # By importing we get a reference to iter_entry_points before it
+        # has been mocked (to test that this case also works).
+        from mock_module import db_entry_points
+
+
+        @pytest.fixture(scope='module')
+        def extra_entry_points():
+            return {
+                'invenio_db.models': [
+                    'mock_module = mock_module',
+                ],
+            }
+
+        def test_app(base_app, db):
+            from mock_module import Place
+            assert Place.query.count() == 0
+
+        def test_extras(base_app, db):
+            for ep in db_entry_points():
+                if ep.name == 'mock_module':
+                    return
+            assert False, "mock_module not found in entry points"
+    """)
+    testdir.runpytest("-s").assert_outcomes(passed=2)

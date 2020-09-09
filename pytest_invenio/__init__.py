@@ -240,6 +240,33 @@ You can overwrite each of these fixtures at many different levels:
   instance you may want to customize the celery configuration only for a
   specific Python test file.
 
+Injecting entry points
+~~~~~~~~~~~~~~~~~~~~~~
+Invenio relies heavily upon entry points for constructing a Flask application,
+and it can be rather cumbersome to try to manually register database models,
+mappings and other features afterwards.
+
+You can therefore inject extra entry points if needed during testing via the
+:py:data:`~fixtures.extra_entry_points` fixture and using it in your custom
+``create_app()`` fixture:
+
+.. code-block:: python
+
+    @pytest.fixture(scope="module")
+    def extra_entry_points():
+        return {
+            'invenio_db.models': [
+                'mock_module = mock_module.models',
+            ]
+        }
+
+    @pytest.fixture(scope="module")
+    def create_app(entry_points):
+        return _create_api
+
+Note that ``create_app()`` depends on the :py:data:`~fixtures.entry_points`
+fixture not the ``extra_entry_points()``.
+
 .. _views-testing:
 
 Views testing
