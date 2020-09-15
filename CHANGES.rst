@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.3.4 (released 2020-09-15)
+
+- Add `entrypoints` fixture to allow injecting extra entry points during
+  testing so that you avoid manual registration of e.g. mappings and schemas.
+
 Version 1.3.3 (released 2020-08-27)
 
 - Add `docker-services-cli` as dependency to enable Invenio modules to
