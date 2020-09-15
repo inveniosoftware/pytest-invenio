@@ -696,8 +696,8 @@ def entry_points(extra_entry_points):
     # state.
     workingset_state = pkg_resources.working_set.__getstate__()
 
-    # Next, make a fake distribution that wil yield the extra entry points and
-    # add it to the global working_set.
+    # Next, make a fake distribution that will yield the extra entry points and
+    # add them to the global working_set.
     dist = MockDistribution(extra_entry_points)
     pkg_resources.working_set.add(dist)
 

@@ -247,7 +247,7 @@ and it can be rather cumbersome to try to manually register database models,
 mappings and other features afterwards.
 
 You can therefore inject extra entry points if needed during testing via the
-:py:data:`~fixtures.extra_entry_points` fixture and using it in your custom
+:py:data:`~fixtures.extra_entry_points` fixture and use it in your custom
 ``create_app()`` fixture:
 
 .. code-block:: python
