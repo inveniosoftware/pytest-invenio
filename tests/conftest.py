@@ -57,4 +57,11 @@ def conftest_testdir(testdir):
         def UserCls():
             return User
     """)
+    testdir.makefile(
+        ".ini",
+        pytest="""
+        [pytest]
+        live_server_scope = module
+        """
+    )
     return testdir

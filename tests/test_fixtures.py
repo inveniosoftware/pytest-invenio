@@ -347,7 +347,7 @@ def test_mailbox(conftest_testdir):
         def test_mailbox(appctx, mailbox):
             pass  # Will never reach here.
     """)
-    conftest_testdir.runpytest().assert_outcomes(passed=1, error=1)
+    conftest_testdir.runpytest().assert_outcomes(passed=1, errors=1)
 
 
 def test_browser_skipped(conftest_testdir):

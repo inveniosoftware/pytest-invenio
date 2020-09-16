@@ -8,6 +8,30 @@
 Changes
 =======
 
+Version 1.4.0 (released 2020-09-16)
+
+- BACKWARD INCOMPATIBLE: Changes to use isort, pycodestyle and pydocstyle via
+  pytest plugins. You need to update `pytest.ini` and remove the ``--pep8``
+  from the addopts and instead add ``--isort --pydocstyle --pycodestyle``:
+
+  .. code-block:: ini
+
+      addopts = --isort --pydocstyle --pycodestyle ...
+
+  In `./run-tests.sh` script you should also remove calls to pydocstyle and
+  isort as both are now integrated with pytest.
+
+- BACKWARD INCOMPATIBLE: Upgrade dependencies: coverage, pytest-flask,
+  check-manifest, pytest. You need to set the pytest-flask live server
+  fixture scope in your pytest config:
+
+  .. code-block:: ini
+
+     [pytest]
+     live_server_scope = function
+
+- Decommission pytest-pep8 (last release in 2014) in favour of pycodestyle.
+
 Version 1.3.4 (released 2020-09-15)
 
 - Add `entrypoints` fixture to allow injecting extra entry points during
