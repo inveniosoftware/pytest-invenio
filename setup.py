@@ -46,18 +46,15 @@ setup_requires = [
 ]
 
 install_requires = [
-    # pinned because of change of fixture scope in pytest-flask v1.0.0
-    # live_server
-    'check-manifest>=0.25',
-    # coverage pinned because of https://github.com/nedbat/coveragepy/issues/716
-    'coverage>=4.0,<5.0.0',
+    'check-manifest>=0.42',
+    'coverage>=5.3,<6',
     'docker-services-cli>=0.1.0',
-    'isort>=4.3',
-    'pydocstyle>=2.0.0',
-    'pytest>=4.6.1',
-    'pytest-cov>=2.5.1',
-    'pytest-flask>=0.15.1,<1.0.0',
-    'pytest-pep8>=1.0.6',
+    'pytest-cov>=2.10.1',
+    'pytest-flask>=1.0.0',
+    'pytest-isort>=1.2.0',
+    'pytest-pycodestyle>=2.2.0',
+    'pytest-pydocstyle>=2.2.0',
+    'pytest>=6,<7',
     'selenium>=3.7.0',
 ]
 
@@ -101,11 +98,11 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Testing',
     ],
