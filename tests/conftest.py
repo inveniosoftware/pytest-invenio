@@ -12,7 +12,7 @@ from __future__ import absolute_import, print_function
 
 import pytest
 
-pytest_plugins = ["pytester"]
+pytest_plugins = ["pytester", "celery.contrib.pytest",]
 
 
 @pytest.fixture()

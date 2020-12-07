@@ -49,7 +49,6 @@ install_requires = [
     'check-manifest>=0.42',
     'coverage>=5.3,<6',
     'docker-services-cli>=0.1.0',
-    'pytest-celery>=0.0.0a1',
     'pytest-cov>=2.10.1',
     'pytest-flask>=1.0.0',
     'pytest-isort>=1.2.0',
