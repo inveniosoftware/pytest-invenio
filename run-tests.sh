@@ -1,20 +1,29 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # -*- coding: utf-8 -*-
 #
-# This file is part of pytest-invenio.
-# Copyright (C) 2017-2018 CERN.
-# Copyright (C) 2018 Northwestern University, Feinberg School of Medicine,
-# Galter Health Sciences Library.
+# This file is part of Invenio.
+# Copyright (C) 2020 CERN.
 #
-# pytest-invenio is free software; you can redistribute it and/or modify it
+# Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-rm -f .coverage
-rm -f .coverage.eager.*
-check-manifest --ignore ".travis-*" && \
-sphinx-build -qnNW docs docs/_build/html && \
-# Following is needed in order to get proper code coverage for pytest plugins.
-# See https://pytest-cov.readthedocs.io/en/latest/plugins.html
-COV_CORE_SOURCE=pytest_invenio COV_CORE_CONFIG=.coveragerc COV_CORE_DATAFILE=.coverage.eager pytest --cov=pytest_invenio
-# Run twice to get proper test coverage results
-COV_CORE_SOURCE=pytest_invenio COV_CORE_CONFIG=.coveragerc COV_CORE_DATAFILE=.coverage.eager pytest --cov=pytest_invenio
+# Quit on errors
+set -o errexit
+
+# Quit on unbound symbols
+set -o nounset
+
+# Always bring down docker services
+function cleanup() {
+    eval "$(docker-services-cli down --env)"
+}
+trap cleanup EXIT
+
+
+python -m check_manifest --ignore ".*-requirements.txt"
+python -m sphinx.cmd.build -qnNW docs docs/_build/html
+eval "$(docker-services-cli up --search ${SEARCH:-es} --env)"
+python -m pytest
+tests_exit_code=$?
+python -m sphinx.cmd.build -qnNW -b doctest docs docs/_build/doctest
+exit "$tests_exit_code"

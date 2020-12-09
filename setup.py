@@ -27,12 +27,12 @@ tests_require = [
     'invenio-mail>=1.0.0,<1.1.0',
     'invenio-search>=1.2.3,<1.3.0',
     'six>=1.12.0',
-    'urllib3>=1.23'
+    'urllib3>=1.21.1,<1.23'
 ]
 
 extras_require = {
     'docs': [
-        'Sphinx>=1.8.0',
+        'Sphinx>=3',
     ],
     'tests': tests_require,
 }
@@ -48,7 +48,7 @@ setup_requires = [
 install_requires = [
     'check-manifest>=0.42',
     'coverage>=5.3,<6',
-    'docker-services-cli>=0.1.0',
+    'docker-services-cli>=0.3.0',
     'pytest-celery>=0.0.0a1',
     'pytest-cov>=2.10.1',
     'pytest-flask>=1.0.0',

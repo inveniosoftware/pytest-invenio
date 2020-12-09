@@ -9,8 +9,8 @@
  pytest-invenio
 ================
 
-.. image:: https://img.shields.io/travis/inveniosoftware/pytest-invenio.svg
-        :target: https://travis-ci.org/inveniosoftware/pytest-invenio
+.. image:: https://github.com/inveniosoftware/pytest-invenio/workflows/CI/badge.svg
+        :target: https://github.com/inveniosoftware/pytest-invenio/actions?query=workflow%3ACI
 
 .. image:: https://img.shields.io/coveralls/inveniosoftware/pytest-invenio.svg
         :target: https://coveralls.io/r/inveniosoftware/pytest-invenio
