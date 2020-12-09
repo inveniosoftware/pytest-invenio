@@ -27,3 +27,4 @@ recursive-include examples *.sh
 recursive-include pytest_invenio *.html
 recursive-include pytest_invenio *.po *.pot *.mo
 recursive-include tests *.py
+recursive-include .github/workflows *.yml
