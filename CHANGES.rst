@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.4.1 (released 2020-12-17)
+
+- Remove pytest-celery because it's still an alpha release.
+
 Version 1.4.0 (released 2020-09-16)
 
 - BACKWARD INCOMPATIBLE: Changes to use isort, pycodestyle and pydocstyle via
