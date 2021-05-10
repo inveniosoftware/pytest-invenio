@@ -548,7 +548,16 @@ def browser(request):
     ``.e2e_screenshots``.
     """
     browser_name = getattr(request, 'param', 'Chrome')
-    driver = getattr(webdriver, browser_name)()
+
+    if browser_name.lower() == "chrome":
+        # this special handling is required to avoid the
+        # 'DevToolsActivePort file doesn't exist' error on github actions
+        from selenium.webdriver.chrome.options import Options
+        options = Options()
+        options.add_argument("--headless")
+        driver = getattr(webdriver, browser_name)(chrome_options=options)
+    else:
+        driver = getattr(webdriver, browser_name)()
 
     yield driver
 
@@ -737,4 +746,10 @@ def extra_entry_points():
 
     Overwrite this fixture to define extra entry points.
     """
+    return {}
+
+
+@pytest.fixture(scope="module")
+def celery_config():
+    """Empty celery config."""
     return {}
