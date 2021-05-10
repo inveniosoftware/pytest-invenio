@@ -175,6 +175,27 @@ def app_config(db_uri, broker_uri, celery_config_ext):
             app_config['MYVAR'] = 'test'
             return app_config
     """
+    icons = {
+        'semantic-ui': {
+            'key': 'key icon',
+            'link': 'linkify icon',
+            'shield': 'shield alternate icon',
+            'user': 'user icon',
+            'codepen': 'codepen icon',
+            'cogs': 'cogs icon',
+            '*': '{} icon'
+        },
+        'bootstrap3': {
+            'key': 'fa fa-key fa-fw',
+            'link': 'fa fa-link fa-fw',
+            'shield': 'fa fa-shield fa-fw',
+            'user': 'fa fa-user fa-fw',
+            'codepen': 'fa fa-codepen fa-fw',
+            'cogs': 'fa fa-cogs fa-fw',
+            '*': 'fa fa-{} fa-fw',
+        }
+    }
+
     return dict(
         APP_DEFAULT_SECURE_HEADERS=dict(
             force_https=False,
@@ -200,7 +221,10 @@ def app_config(db_uri, broker_uri, celery_config_ext):
         # Disable CRSF protection in WTForms
         WTF_CSRF_ENABLED=False,
         # Celery configuration
-        **celery_config_ext
+        **celery_config_ext,
+        # Theme
+        APP_THEME=["semantic-ui"],
+        THEME_ICONS=icons,
     )
 
 
