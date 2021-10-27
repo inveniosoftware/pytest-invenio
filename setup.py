@@ -21,6 +21,7 @@ history = open('CHANGES.rst').read()
 tests_require = [
     'elasticsearch-dsl>=6.0.0,<7.0.0',
     'elasticsearch>=6.0.0,<7.0.0',
+    'invenio-cache>=1.1.0',
     'invenio-celery>=1.2.0',
     'invenio-db>=1.0.9,<1.1.0',
     'invenio-files-rest>=1.1.1',

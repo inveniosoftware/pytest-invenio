@@ -753,3 +753,14 @@ def extra_entry_points():
 def celery_config():
     """Empty celery config."""
     return {}
+
+
+@pytest.fixture(scope="function")
+def cache():
+    """Empty cache."""
+    from invenio_cache import current_cache
+    try:
+        current_cache.clear()
+        yield current_cache
+    finally:
+        current_cache.clear()
