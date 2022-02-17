@@ -30,7 +30,7 @@ jobs:
       matrix:
           python-version: [3.7, 3.8, 3.9]
           requirements-level: [min, pypi]
-          search-service: [elasticsearch6]
+          search-service: [elasticsearch7]
           exclude:
           - python-version: 3.8
             requirements-level: min
@@ -39,8 +39,8 @@ jobs:
             requirements-level: min
 
           include:
-          - search-service: elasticsearch6
-            SEARCH_EXTRAS: "elasticsearch6"
+          - search-service: elasticsearch7
+            SEARCH_EXTRAS: "elasticsearch7"
 
     env:
       SEARCH: ${{ matrix.search-service }}

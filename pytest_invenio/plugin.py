@@ -18,8 +18,6 @@ and taking screenshots of failed selenium tests (useful for inspecting why
 the test failed on CI systems).
 """
 
-from __future__ import absolute_import, print_function
-
 import os
 
 import pytest
