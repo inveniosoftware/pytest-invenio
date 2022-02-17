@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.4.3 (released 2022-02-18)
+
+- Adds support for using importlib_metadata to read the patched entry points.
+
 Version 1.4.2 (released 2021-05-11)
 
 - Add APP_THEME and THEME_ICONS in default app config, often needed when testing
