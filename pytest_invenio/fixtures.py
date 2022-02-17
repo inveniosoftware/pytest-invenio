@@ -11,13 +11,11 @@
 
 from __future__ import absolute_import, print_function
 
-import json
 import os
 import shutil
 import sys
 import tempfile
 from datetime import datetime
-from functools import partial
 
 import pkg_resources
 import pytest
