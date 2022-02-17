@@ -218,11 +218,11 @@ def test_es_clear(conftest_testdir):
     """Test Elasticsearch clearing."""
     # Create an Elasticsearch mapping for Invenio-Search
     conftest_testdir.mkpydir('data')
-    conftest_testdir.mkpydir('data/v6')
-    conftest_testdir.mkdir('data/v6/demo')
-    with open('data/v6/demo/default-v1.0.0.json', 'w') as fp:
-        fp.write(json.dumps({"mappings": {"_doc": {"properties": {
-            "title": {"type": "text", "fielddata": True}}}}}))
+    conftest_testdir.mkpydir('data/v7')
+    conftest_testdir.mkdir('data/v7/demo')
+    with open('data/v7/demo/default-v1.0.0.json', 'w') as fp:
+        fp.write(json.dumps({"mappings": {"properties": {
+            "title": {"type": "text", "fielddata": True}}}}))
     # Create test
     conftest_testdir.makepyfile("""
         import pytest
@@ -409,7 +409,6 @@ def test_default_location(conftest_testdir):
 def test_bucket_from_dir(conftest_testdir):
     conftest_testdir.makepyfile("""
         import tempfile, os
-        import six
         from invenio_files_rest.models import ObjectVersion
 
         def test_creating_location_and_use_bucket_from_dir(bucket_from_dir):
@@ -419,7 +418,7 @@ def test_bucket_from_dir(conftest_testdir):
                 os.path.join(dir_for_files, 'output_file'),
                 'wb'
             ) as file_out:
-                file_out.write(six.b('a'*1024))
+                file_out.write(('a'*1024).encode('utf8'))
             # load file to bucket
             bucket = bucket_from_dir(dir_for_files)
 

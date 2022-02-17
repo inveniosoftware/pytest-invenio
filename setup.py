@@ -19,15 +19,13 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
-    'elasticsearch-dsl>=6.0.0,<7.0.0',
-    'elasticsearch>=6.0.0,<7.0.0',
-    'invenio-celery>=1.2.0',
-    'invenio-db>=1.0.9,<1.1.0',
-    'invenio-files-rest>=1.1.1',
-    'invenio-mail>=1.0.0,<1.1.0',
-    'invenio-search>=1.2.3,<1.3.0',
-    'six>=1.12.0',
-    'urllib3>=1.21.1,<1.23'
+    'elasticsearch>=7.0.0,<7.14',
+    'elasticsearch-dsl>=7.0.0,<8.0.0',
+    'invenio-celery>=1.2.4',
+    'invenio-db>=1.0.12,<1.1.0',
+    'invenio-files-rest>=1.3.2',
+    'invenio-mail>=1.0.2,<1.1.0',
+    'invenio-search>=1.4.2,<1.5.0',
 ]
 
 extras_require = {
@@ -41,17 +39,13 @@ extras_require['all'] = []
 for reqs in extras_require.values():
     extras_require['all'].extend(reqs)
 
-setup_requires = [
-    'pytest-runner>=3.0.0,<5',
-]
-
 install_requires = [
     'check-manifest>=0.42',
     'coverage>=5.3,<6',
-    'docker-services-cli>=0.3.0',
-    'pytest-cov>=2.10.1',
-    'pytest-flask>=1.0.0',
-    'pytest-isort>=1.2.0',
+    'docker-services-cli>=0.4.0',
+    'pytest-cov>=3.0.0',
+    'pytest-flask>=1.2.0',
+    'pytest-isort>=3.0.0',
     'pytest-pycodestyle>=2.2.0',
     'pytest-pydocstyle>=2.2.0',
     'pytest>=6,<7',
@@ -88,7 +82,6 @@ setup(
     },
     extras_require=extras_require,
     install_requires=install_requires,
-    setup_requires=setup_requires,
     tests_require=tests_require,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
