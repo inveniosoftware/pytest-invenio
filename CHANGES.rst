@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.4.4 (released 2022-02-21)
+
+- Adds new UserFixture for easier test user creation.
+
 Version 1.4.3 (released 2022-02-18)
 
 - Adds support for using importlib_metadata to read the patched entry points.
