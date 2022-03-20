@@ -14,13 +14,14 @@ import shutil
 import sys
 import tempfile
 from datetime import datetime
-from unittest.mock import patch
 
 import importlib_metadata
 import pkg_resources
 import pytest
 from pytest_flask.plugin import _make_test_response_class
 from selenium import webdriver
+
+from .user import UserFixtureBase
 
 SCREENSHOT_SCRIPT = """import base64
 with open('screenshot.png', 'wb') as fp:
@@ -590,8 +591,8 @@ def _get_screenshots_dir():
     return directory
 
 
-@pytest.yield_fixture(scope='function')
-def location(db):
+@pytest.yield_fixture(scope='module')
+def location(database):
     """Creates a simple default location for a test.
 
     Scope: function
@@ -605,8 +606,8 @@ def location(db):
     uri = tempfile.mkdtemp()
     location_obj = Location(name="pytest-location", uri=uri, default=True)
 
-    db.session.add(location_obj)
-    db.session.commit()
+    database.session.add(location_obj)
+    database.session.commit()
 
     yield location_obj
 
@@ -793,3 +794,29 @@ def extra_entry_points():
 def celery_config():
     """Empty celery config."""
     return {}
+
+
+@pytest.fixture(scope='session')
+def UserFixture():
+    """Fixture to help create user fixtures.
+
+    Scope: session
+
+    .. code-block:: python
+
+        @pytest.fixture()
+        def myuser(UserFixture, app, db):
+            u = UserFixture(
+                email="myuser@inveniosoftware.org",
+                password="auser",
+            )
+            u.create(app, db)
+            return u
+
+        def test_with_user(service, myuser):
+            service.dosomething(myuser.identity)
+
+
+
+    """
+    return UserFixtureBase
