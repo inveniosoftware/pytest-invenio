@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.4.5 (released 2022-02-23)
+
+- Fixes an import so that pytest-invenio is now usable without
+  Invenio-Accounts installed.
+
 Version 1.4.4 (released 2022-02-21)
 
 - Adds new UserFixture for easier test user creation.
