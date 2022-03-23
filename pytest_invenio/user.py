@@ -11,8 +11,6 @@
 
 from copy import deepcopy
 
-from flask_principal import Identity, identity_changed
-
 
 class UserFixtureBase:
     """A user fixture for easy test user creation."""
@@ -79,6 +77,7 @@ class UserFixtureBase:
     def identity(self):
         """Create identity for the user."""
         if self._identity is None:
+            from flask_principal import Identity, identity_changed
             with self._app.test_request_context():
                 # Simulate a full login -  we do not use flask-security's
                 # login_user because it adds login ips/timestamps on every
