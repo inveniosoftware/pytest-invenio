@@ -15,8 +15,11 @@ from copy import deepcopy
 class UserFixtureBase:
     """A user fixture for easy test user creation."""
 
-    def __init__(self, email=None, password=None, active=True):
+    def __init__(self, email=None, password=None, username=None, active=True,
+                 profile=None):
         """Constructor."""
+        self._username = username
+        self._profile = profile
         self._email = email
         self._active = active
         self._password = password
@@ -32,11 +35,17 @@ class UserFixtureBase:
         from flask_security.utils import hash_password
         with db.session.begin_nested():
             datastore = app.extensions["security"].datastore
-            user = datastore.create_user(
+            data = dict(
                 email=self.email,
                 password=hash_password(self.password),
                 active=self._active,
             )
+            # Support both Invenio-Accounts 1.4 and 2.0
+            if self.username is not None:
+                data['username'] = self.username
+            if self.username is not None:
+                data['profile'] = self._profile
+            user = datastore.create_user(**data)
         db.session.commit()
         self._user = user
         self._app = app
@@ -59,6 +68,11 @@ class UserFixtureBase:
     def email(self):
         """Get the user."""
         return self._email
+
+    @property
+    def username(self):
+        """Get the user."""
+        return self._username
 
     @property
     def password(self):
