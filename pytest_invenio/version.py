@@ -12,4 +12,4 @@ This file is imported by ``pytest_invenio.__init__``,
 and parsed by ``setup.py``.
 """
 
-__version__ = '1.4.5'
+__version__ = '1.4.6'

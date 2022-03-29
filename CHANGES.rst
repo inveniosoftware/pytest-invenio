@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.4.6 (released 2022-02-29)
+
+- Adds support for Invenio-Accounts 2.0 in the UserFixture.
+
 Version 1.4.5 (released 2022-02-23)
 
 - Fixes an import so that pytest-invenio is now usable without
