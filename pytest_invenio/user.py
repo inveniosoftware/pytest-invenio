@@ -10,18 +10,21 @@
 """Helper class for creating and using user fixtures."""
 
 from copy import deepcopy
+from datetime import datetime
 
 
 class UserFixtureBase:
     """A user fixture for easy test user creation."""
 
     def __init__(self, email=None, password=None, username=None, active=True,
-                 profile=None):
+                 confirmed=True, user_profile=None, preferences=None):
         """Constructor."""
         self._username = username
-        self._profile = profile
+        self._user_profile = user_profile
+        self._preferences = preferences
         self._email = email
         self._active = active
+        self._confirmed = datetime.utcnow() if confirmed else None
         self._password = password
         self._identity = None
         self._user = None
@@ -39,13 +42,16 @@ class UserFixtureBase:
                 email=self.email,
                 password=hash_password(self.password),
                 active=self._active,
+                confirmed_at=self._confirmed,
             )
             # Support both Invenio-Accounts 1.4 and 2.0
             if self.username is not None:
                 data['username'] = self.username
-            if self.username is not None:
-                data['profile'] = self._profile
             user = datastore.create_user(**data)
+            if self._user_profile is not None:
+                user.user_profile = self._user_profile
+            if self._preferences is not None:
+                user.preferences = self._preferences
         db.session.commit()
         self._user = user
         self._app = app
