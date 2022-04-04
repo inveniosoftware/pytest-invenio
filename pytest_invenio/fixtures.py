@@ -14,6 +14,7 @@ import shutil
 import sys
 import tempfile
 from datetime import datetime
+from warnings import warn
 
 import importlib_metadata
 import pkg_resources
@@ -321,23 +322,22 @@ def appctx(base_app):
 
 @pytest.fixture(scope='module')
 def script_info(base_app):
-    """Get ScriptInfo object for testing a CLI command.
+    """Get ScriptInfo object for testing a CLI command. (DEPRECATED)
 
     Scope: module
 
-    .. code-block:: python
-
-        def test_cmd(script_info):
-            runner = CliRunner()
-            result = runner.invoke(mycmd, obj=script_info)
-            assert result.exit_code == 0
+    Use the ``cli_runner`` runner fixture directly, or use the base_app:
     """
     from flask.cli import ScriptInfo
+    warn(
+        'script_info is deprecated. Use cli_runner directly instead.',
+        DeprecationWarning
+    )
     return ScriptInfo(create_app=lambda info: base_app)
 
 
 @pytest.fixture(scope='module')
-def cli_runner(script_info):
+def cli_runner(base_app):
     """Create a CLI runner for testing a CLI command.
 
     Scope: module
@@ -348,10 +348,8 @@ def cli_runner(script_info):
             result = cli_runner(mycmd)
             assert result.exit_code == 0
     """
-    from click.testing import CliRunner
-
     def cli_invoke(command, input=None, *args):
-        return CliRunner().invoke(command, args, input=input, obj=script_info)
+        return base_app.test_cli_runner().invoke(command, args, input=input)
     return cli_invoke
 
 
