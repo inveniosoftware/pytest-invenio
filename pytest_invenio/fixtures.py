@@ -322,7 +322,7 @@ def appctx(base_app):
 
 @pytest.fixture(scope='module')
 def script_info(base_app):
-    """Get ScriptInfo object for testing a CLI command. (DEPRECATED)
+    """Get ScriptInfo object for testing a CLI command (DEPRECATED).
 
     Scope: module
 
@@ -333,7 +333,7 @@ def script_info(base_app):
         'script_info is deprecated. Use cli_runner directly instead.',
         DeprecationWarning
     )
-    return ScriptInfo(create_app=lambda info: base_app)
+    return ScriptInfo(create_app=lambda *args: base_app)
 
 
 @pytest.fixture(scope='module')

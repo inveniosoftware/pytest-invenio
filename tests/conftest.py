@@ -28,7 +28,7 @@ def conftest_testdir(testdir):
 
         def _factory(name, **config):
             app_ = Flask(name)
-            app_.config.update(**config)
+            app_.config.update(DB_VERSIONING=False, **config)
             InvenioDB(app_)
             InvenioSearch(app_)
             InvenioMail(app_)
