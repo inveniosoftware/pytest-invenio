@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.4.7 (released 2022-04-04)
+
+- Adds support for Flask v2.1
+
 Version 1.4.6 (released 2022-02-29)
 
 - Adds support for Invenio-Accounts 2.0 in the UserFixture.
