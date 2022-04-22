@@ -1,12 +1,16 @@
 ..
     This file is part of pytest-invenio.
-    Copyright (C) 2018-2021 CERN.
+    Copyright (C) 2018-2022 CERN.
 
     pytest-invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version 1.4.8 (released 2022-04-22)
+
+- Commit users through the datastore in the UserFixture.
 
 Version 1.4.7 (released 2022-04-04)
 
