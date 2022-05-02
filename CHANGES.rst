@@ -8,7 +8,12 @@
 Changes
 =======
 
-Version 1.4.8 (released 2022-04-22)
+Version 1.4.9 (released 2022-05-02)
+
+- Mark users as changed and commit through datastore (outside of context
+  manager).
+
+Version 1.4.8 (yanked 2022-05-02 due to UserFixture session close issues)
 
 - Commit users through the datastore in the UserFixture.
 
