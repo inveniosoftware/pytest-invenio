@@ -52,8 +52,9 @@ class UserFixtureBase:
                 user.user_profile = self._user_profile
             if self._preferences is not None:
                 user.preferences = self._preferences
-            datastore.commit()
-        db.session.commit()
+            db.session.add(user)
+            datastore.mark_changed(id(db.session), uid=user.id)
+        datastore.commit()
         self._user = user
         self._app = app
         return self
