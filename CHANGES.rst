@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.4.10 (released 2022-05-04)
+
+- Fixes an issue with the user id in the UserFixture being None before the
+  db session is flushed.
+
 Version 1.4.9 (released 2022-05-02)
 
 - Mark users as changed and commit through datastore (outside of context
