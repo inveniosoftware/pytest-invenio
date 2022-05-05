@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.4.11 (released 2022-05-05)
+
+- Upper pin Selenium dependency, v4 drops support for Python 3.7.
+
 Version 1.4.10 (released 2022-05-04)
 
 - Fixes an issue with the user id in the UserFixture being None before the
