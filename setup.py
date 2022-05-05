@@ -49,7 +49,7 @@ install_requires = [
     'pytest-pycodestyle>=2.2.0',
     'pytest-pydocstyle>=2.2.0',
     'pytest>=6,<7',
-    'selenium>=3.7.0',
+    'selenium>=3.7.0,<4',  # Selenium 4 drops Python < 3.7
     # Keep importlib aligned with invenio-base.
     'importlib-metadata>=4.4',
     'importlib-resources>=5.0',
