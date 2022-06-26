@@ -30,7 +30,7 @@ with open('screenshot.png', 'wb') as fp:
 """
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def default_handler():
     """Flask default logging handler.
 
@@ -41,12 +41,13 @@ def default_handler():
     """
     try:
         from flask.logging import default_handler as handler
+
         return handler
     except ImportError:
         return None
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def instance_path():
     """Temporary instance path.
 
@@ -58,15 +59,15 @@ def instance_path():
     """
     path = tempfile.mkdtemp()
     os.environ.update(
-        INVENIO_INSTANCE_PATH=os.environ.get('INSTANCE_PATH', path),
-        INVENIO_STATIC_FOLDER=os.path.join(sys.prefix, 'var/instance/static'),
+        INVENIO_INSTANCE_PATH=os.environ.get("INSTANCE_PATH", path),
+        INVENIO_STATIC_FOLDER=os.path.join(sys.prefix, "var/instance/static"),
     )
     yield path
-    os.environ.pop('INVENIO_INSTANCE_PATH', None)
+    os.environ.pop("INVENIO_INSTANCE_PATH", None)
     shutil.rmtree(path)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def db_uri(instance_path):
     """Database URI (defaults to an SQLite datbase in the instance path).
 
@@ -75,16 +76,15 @@ def db_uri(instance_path):
     The database can be overwritten by setting the ``SQLALCHEMY_DATABASE_URI``
     environment variable to a SQLAlchemy database URI.
     """
-    if 'SQLALCHEMY_DATABASE_URI' in os.environ:
-        yield os.environ['SQLALCHEMY_DATABASE_URI']
+    if "SQLALCHEMY_DATABASE_URI" in os.environ:
+        yield os.environ["SQLALCHEMY_DATABASE_URI"]
     else:
-        filepath = tempfile.mkstemp(
-            dir=instance_path, prefix='test', suffix='.db')[1]
-        yield 'sqlite:///{}'.format(filepath)
+        filepath = tempfile.mkstemp(dir=instance_path, prefix="test", suffix=".db")[1]
+        yield "sqlite:///{}".format(filepath)
         os.remove(filepath)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def broker_uri():
     """Broker URI (defaults to an RabbitMQ on localhost).
 
@@ -93,7 +93,7 @@ def broker_uri():
     The broker can be overwritten by setting the ``BROKER_URL`` environment
     variable.
     """
-    yield os.environ.get('BROKER_URL', 'amqp://guest:guest@localhost:5672//')
+    yield os.environ.get("BROKER_URL", "amqp://guest:guest@localhost:5672//")
 
 
 def _celery_config():
@@ -109,18 +109,19 @@ def _celery_config():
     """
     default_config = dict(
         CELERY_TASK_ALWAYS_EAGER=True,
-        CELERY_CACHE_BACKEND='memory',
+        CELERY_CACHE_BACKEND="memory",
         CELERY_TASK_EAGER_PROPAGATES_EXCEPTIONS=True,
-        CELERY_RESULT_BACKEND='cache',
+        CELERY_RESULT_BACKEND="cache",
     )
 
     try:
-        pkg_resources.get_distribution('celery')
+        pkg_resources.get_distribution("celery")
 
         # Celery is installed, overwrite fixture
         def inner(celery_config):
             celery_config.update(default_config)
             return celery_config
+
     except pkg_resources.DistributionNotFound:
         # No Celery, return the default config
         def inner():
@@ -129,8 +130,9 @@ def _celery_config():
     return inner
 
 
-celery_config_ext = pytest.fixture(
-    scope='module', name='celery_config_ext')(_celery_config())
+celery_config_ext = pytest.fixture(scope="module", name="celery_config_ext")(
+    _celery_config()
+)
 """Celery configuration (defaults to eager tasks).
 
 Scope: module
@@ -151,7 +153,7 @@ overwritten in a specific test module:
 """
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def app_config(db_uri, broker_uri, celery_config_ext):
     """Application configuration fixture.
 
@@ -176,30 +178,29 @@ def app_config(db_uri, broker_uri, celery_config_ext):
             return app_config
     """
     icons = {
-        'semantic-ui': {
-            'key': 'key icon',
-            'link': 'linkify icon',
-            'shield': 'shield alternate icon',
-            'user': 'user icon',
-            'codepen': 'codepen icon',
-            'cogs': 'cogs icon',
-            '*': '{} icon'
+        "semantic-ui": {
+            "key": "key icon",
+            "link": "linkify icon",
+            "shield": "shield alternate icon",
+            "user": "user icon",
+            "codepen": "codepen icon",
+            "cogs": "cogs icon",
+            "*": "{} icon",
         },
-        'bootstrap3': {
-            'key': 'fa fa-key fa-fw',
-            'link': 'fa fa-link fa-fw',
-            'shield': 'fa fa-shield fa-fw',
-            'user': 'fa fa-user fa-fw',
-            'codepen': 'fa fa-codepen fa-fw',
-            'cogs': 'fa fa-cogs fa-fw',
-            '*': 'fa fa-{} fa-fw',
-        }
+        "bootstrap3": {
+            "key": "fa fa-key fa-fw",
+            "link": "fa fa-link fa-fw",
+            "shield": "fa fa-shield fa-fw",
+            "user": "fa fa-user fa-fw",
+            "codepen": "fa fa-codepen fa-fw",
+            "cogs": "fa fa-cogs fa-fw",
+            "*": "fa fa-{} fa-fw",
+        },
     }
 
     return dict(
         APP_DEFAULT_SECURE_HEADERS=dict(
-            force_https=False,
-            content_security_policy={'default-src': []}
+            force_https=False, content_security_policy={"default-src": []}
         ),
         # Broker configuration
         BROKER_URL=broker_uri,
@@ -209,10 +210,10 @@ def app_config(db_uri, broker_uri, celery_config_ext):
         MAIL_SUPPRESS_SEND=True,
         # Allow testing OAuth without SSL.
         OAUTHLIB_INSECURE_TRANSPORT=True,
-        OAUTH2_CACHE_TYPE='simple',
+        OAUTH2_CACHE_TYPE="simple",
         # Set test secret keys
-        SECRET_KEY='test-secret-key',
-        SECURITY_PASSWORD_SALT='test-secret-key',
+        SECRET_KEY="test-secret-key",
+        SECURITY_PASSWORD_SALT="test-secret-key",
         # Database configuration
         SQLALCHEMY_DATABASE_URI=db_uri,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
@@ -228,7 +229,7 @@ def app_config(db_uri, broker_uri, celery_config_ext):
     )
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def base_app(create_app, app_config, request, default_handler):
     """Base application fixture (without database, search and cache).
 
@@ -263,7 +264,7 @@ def base_app(create_app, app_config, request, default_handler):
     """
     # Use create_app from the module if defined, otherwise use default
     # create_app fixture.
-    create_app = getattr(request.module, 'create_app', create_app)
+    create_app = getattr(request.module, "create_app", create_app)
     app_ = create_app(**app_config)
     # See documentation for default_handler
     if default_handler:
@@ -271,7 +272,7 @@ def base_app(create_app, app_config, request, default_handler):
     yield app_
 
 
-@pytest.fixture(autouse=True, scope='function')
+@pytest.fixture(autouse=True, scope="function")
 def _monkeypatch_response_class(request, monkeypatch):
     """Set custom response class to easily test JSON responses.
 
@@ -283,16 +284,16 @@ def _monkeypatch_response_class(request, monkeypatch):
 
     Pytest-Flask provides this already for the "app" fixture
     """
-    if 'base_app' not in request.fixturenames:
+    if "base_app" not in request.fixturenames:
         return
 
-    base_app = request.getfixturevalue('base_app')
+    base_app = request.getfixturevalue("base_app")
     monkeypatch.setattr(
-        base_app, 'response_class',
-        _make_test_response_class(base_app.response_class))
+        base_app, "response_class", _make_test_response_class(base_app.response_class)
+    )
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def base_client(base_app):
     """Test client for the base application fixture.
 
@@ -307,7 +308,7 @@ def base_client(base_app):
         yield client
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def appctx(base_app):
     """Application context for the current base application.
 
@@ -320,7 +321,7 @@ def appctx(base_app):
         yield base_app
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def script_info(base_app):
     """Get ScriptInfo object for testing a CLI command (DEPRECATED).
 
@@ -329,14 +330,15 @@ def script_info(base_app):
     Use the ``cli_runner`` runner fixture directly, or use the base_app:
     """
     from flask.cli import ScriptInfo
+
     warn(
-        'script_info is deprecated. Use cli_runner directly instead.',
-        DeprecationWarning
+        "script_info is deprecated. Use cli_runner directly instead.",
+        DeprecationWarning,
     )
     return ScriptInfo(create_app=lambda *args: base_app)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def cli_runner(base_app):
     """Create a CLI runner for testing a CLI command.
 
@@ -348,14 +350,17 @@ def cli_runner(base_app):
             result = cli_runner(mycmd)
             assert result.exit_code == 0
     """
+
     def cli_invoke(command, input=None, *args):
         return base_app.test_cli_runner().invoke(command, args, input=input)
+
     return cli_invoke
 
 
 def _es_create_indexes(current_search, current_search_client):
     """Create all registered Elasticsearch indexes."""
     from elasticsearch.exceptions import RequestError
+
     try:
         list(current_search.create())
     except RequestError:
@@ -369,7 +374,7 @@ def _es_delete_indexes(current_search):
     list(current_search.delete(ignore=[404]))
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def es(appctx):
     """Setup and teardown all registered Elasticsearch indices.
 
@@ -381,12 +386,13 @@ def es(appctx):
     indexes clean for the following tests.
     """
     from invenio_search import current_search, current_search_client
+
     _es_create_indexes(current_search, current_search_client)
     yield current_search_client
     _es_delete_indexes(current_search)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def es_clear(es):
     """Clear Elasticsearch indices after test finishes (function scope).
 
@@ -396,12 +402,13 @@ def es_clear(es):
     in order to leave Elasticsearch in a clean state for the next test.
     """
     from invenio_search import current_search, current_search_client
+
     yield es
     _es_delete_indexes(current_search)
     _es_create_indexes(current_search, current_search_client)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def database(appctx):
     """Setup database.
 
@@ -413,6 +420,7 @@ def database(appctx):
     """
     from invenio_db import db as db_
     from sqlalchemy_utils.functions import create_database, database_exists
+
     if not database_exists(str(db_.engine.url)):
         create_database(str(db_.engine.url))
     db_.create_all()
@@ -423,7 +431,7 @@ def database(appctx):
     db_.drop_all()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def db(database):
     """Creates a new database session for a test.
 
@@ -434,6 +442,7 @@ def db(database):
     the test (this is much faster than recreating the entire database).
     """
     import sqlalchemy as sa
+
     connection = database.engine.connect()
     transaction = connection.begin()
 
@@ -445,7 +454,7 @@ def db(database):
     # `session` is actually a scoped_session. For the `after_transaction_end`
     # event, we need a session instance to listen for, hence the `session()`
     # call.
-    @sa.event.listens_for(session(), 'after_transaction_end')
+    @sa.event.listens_for(session(), "after_transaction_end")
     def restart_savepoint(sess, trans):
         if trans.nested and not trans._parent.nested:
             session.expire_all()
@@ -462,7 +471,7 @@ def db(database):
     database.session = old_session
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def mailbox(base_app):
     """Mailbox fixture.
 
@@ -481,16 +490,15 @@ def mailbox(base_app):
                 recipients=['no-reply@localhost'])
             assert len(mailbox) == 1
     """
-    ext = base_app.extensions.get('mail')
+    ext = base_app.extensions.get("mail")
     if ext is None:
-        raise RuntimeError(
-            'Invenio-Mail extension is not installed on application.')
+        raise RuntimeError("Invenio-Mail extension is not installed on application.")
     else:
         with ext.record_messages() as outbox:
             yield outbox
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def app(base_app, es, database):
     """Invenio application with database and Elasticsearch.
 
@@ -502,7 +510,7 @@ def app(base_app, es, database):
     yield base_app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def browser(request):
     """Selenium webdriver fixture.
 
@@ -544,12 +552,13 @@ def browser(request):
     In case the test fail, a screenshot will be taken and saved in folder
     ``.e2e_screenshots``.
     """
-    browser_name = getattr(request, 'param', 'Chrome')
+    browser_name = getattr(request, "param", "Chrome")
 
     if browser_name.lower() == "chrome":
         # this special handling is required to avoid the
         # 'DevToolsActivePort file doesn't exist' error on github actions
         from selenium.webdriver.chrome.options import Options
+
         options = Options()
         options.add_argument("--headless")
         driver = getattr(webdriver, browser_name)(chrome_options=options)
@@ -567,16 +576,16 @@ def browser(request):
 def _take_screenshot_if_test_failed(driver, request):
     """Take a screenshot if the test failed."""
     if request.node.rep_call.failed:
-        filename = '{modname}::{funname}::{now}.png'.format(
+        filename = "{modname}::{funname}::{now}.png".format(
             modname=request.module.__name__,
-            funname=request.function.__name__ if request.function else '',
-            now=datetime.now().isoformat())
+            funname=request.function.__name__ if request.function else "",
+            now=datetime.now().isoformat(),
+        )
         filepath = os.path.join(_get_screenshots_dir(), filename)
         driver.get_screenshot_as_file(filepath)
         print("Screenshot of failing test:")
-        if os.environ.get('E2E_OUTPUT') == 'base64':
-            print(SCREENSHOT_SCRIPT.format(
-                data=driver.get_screenshot_as_base64()))
+        if os.environ.get("E2E_OUTPUT") == "base64":
+            print(SCREENSHOT_SCRIPT.format(data=driver.get_screenshot_as_base64()))
         else:
             print(filepath)
 
@@ -589,7 +598,7 @@ def _get_screenshots_dir():
     return directory
 
 
-@pytest.yield_fixture(scope='module')
+@pytest.yield_fixture(scope="module")
 def location(database):
     """Creates a simple default location for a test.
 
@@ -601,6 +610,7 @@ def location(database):
     ``pytest-location``.
     """
     from invenio_files_rest.models import Location
+
     uri = tempfile.mkdtemp()
     location_obj = Location(name="pytest-location", uri=uri, default=True)
 
@@ -642,6 +652,7 @@ def bucket_from_dir(db, location):
             bucket = bucket_from_dir('/my/directory/path')
             # ... use the bucket for your test
     '''
+
     def create_bucket_from_dir(source_dir, location_obj=None):
         """Create bucket from the specified source directory.
 
@@ -651,18 +662,19 @@ def bucket_from_dir(db, location):
         :returns: The new bucket object.
         """
         if not location_obj:
-            from invenio_files_rest.models import Bucket, Location, \
-                ObjectVersion
+            from invenio_files_rest.models import Bucket, Location, ObjectVersion
+
             location_obj = Location.get_default() or location
         bucket_obj = Bucket.create(location_obj)
         for file_name in os.listdir(source_dir):
             full_file_path = os.path.join(source_dir, file_name)
             if os.path.isdir(full_file_path):
                 continue
-            file_obj = open(full_file_path, 'rb')
+            file_obj = open(full_file_path, "rb")
             ObjectVersion.create(bucket_obj, key=file_name, stream=file_obj)
         db.session.commit()
         return bucket_obj
+
     return create_bucket_from_dir
 
 
@@ -684,7 +696,7 @@ class MockDistribution(pkg_resources.Distribution):
             self._ep_map[group] = group_map
         # Note location must have a non-empty string value, as it is used as a
         # key into a dictionary.
-        super().__init__(location='unknown')
+        super().__init__(location="unknown")
 
     def _require_noop(self, *args, **kwargs):
         """Do nothing on entry point require."""
@@ -701,17 +713,19 @@ class MockImportlibDistribution(importlib_metadata.Distribution):
     @property
     def name(self):
         """Return the 'Name' metadata for the distribution package."""
-        return 'MockDistribution'
+        return "MockDistribution"
 
     @property
     def entry_points(self):
         """Iterate over entry points."""
         for group, eps_lines in self._entry_points.items():
             for ep_line in eps_lines:
-                name, value = ep_line.split('=', maxsplit=1)
+                name, value = ep_line.split("=", maxsplit=1)
                 yield importlib_metadata.EntryPoint(
                     # strip possible white space due to split on "="
-                    name=name.strip(), value=value.strip(), group=group
+                    name=name.strip(),
+                    value=value.strip(),
+                    group=group,
                 )
 
 
@@ -794,7 +808,7 @@ def celery_config():
     return {}
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def UserFixture():
     """Fixture to help create user fixtures.
 

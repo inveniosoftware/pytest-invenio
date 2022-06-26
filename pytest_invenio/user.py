@@ -16,8 +16,16 @@ from datetime import datetime
 class UserFixtureBase:
     """A user fixture for easy test user creation."""
 
-    def __init__(self, email=None, password=None, username=None, active=True,
-                 confirmed=True, user_profile=None, preferences=None):
+    def __init__(
+        self,
+        email=None,
+        password=None,
+        username=None,
+        active=True,
+        confirmed=True,
+        user_profile=None,
+        preferences=None,
+    ):
         """Constructor."""
         self._username = username
         self._user_profile = user_profile
@@ -36,6 +44,7 @@ class UserFixtureBase:
     def create(self, app, db):
         """Create the user."""
         from flask_security.utils import hash_password
+
         with db.session.begin_nested():
             datastore = app.extensions["security"].datastore
             data = dict(
@@ -46,7 +55,7 @@ class UserFixtureBase:
             )
             # Support both Invenio-Accounts 1.4 and 2.0
             if self.username is not None:
-                data['username'] = self.username
+                data["username"] = self.username
             user = datastore.create_user(**data)
             if self._user_profile is not None:
                 user.user_profile = self._user_profile
@@ -100,12 +109,14 @@ class UserFixtureBase:
         """Create identity for the user."""
         if self._identity is None:
             from flask_principal import Identity, identity_changed
+
             with self._app.test_request_context():
                 # Simulate a full login -  we do not use flask-security's
                 # login_user because it adds login ips/timestamps on every
                 # login
                 from flask_login import login_user
                 from flask_security import logout_user
+
                 login_user(self.user)
                 identity = Identity(self.id)
                 identity_changed.send(self._app, identity=identity)
@@ -122,11 +133,13 @@ class UserFixtureBase:
     def app_login(self):
         """Create identity for the user."""
         from flask_security import login_user
+
         assert login_user(self.user)
 
     def app_logout(self):
         """Create identity for the user."""
         from flask_security import logout_user
+
         assert logout_user()
 
     #
@@ -134,28 +147,28 @@ class UserFixtureBase:
     #
     def login(self, client, logout_first=False):
         """Login the given client."""
-        return self._login(client, '/', logout_first)
+        return self._login(client, "/", logout_first)
 
     def api_login(self, client, logout_first=False):
         """Login the given client."""
-        return self._login(client, '/api/', logout_first)
+        return self._login(client, "/api/", logout_first)
 
     def logout(self, client):
         """Logout the given client."""
-        return self._logout(client, '/')
+        return self._logout(client, "/")
 
     def api_logout(self, client):
         """Logout the given client."""
-        return self._logout(client, '/api/')
+        return self._logout(client, "/api/")
 
     def _login(self, client, base_path, logout):
         """Login the given client."""
         if logout:
             self._logout(client, base_path)
         res = client.post(
-            f'{base_path}login',
+            f"{base_path}login",
             data=dict(email=self.email, password=self.password),
-            environ_base={'REMOTE_ADDR': '127.0.0.1'},
+            environ_base={"REMOTE_ADDR": "127.0.0.1"},
             follow_redirects=True,
         )
         assert res.status_code == 200
@@ -163,6 +176,6 @@ class UserFixtureBase:
 
     def _logout(self, client, base_path):
         """Logout the client."""
-        res = client.get(f'{base_path}logout')
+        res = client.get(f"{base_path}logout")
         assert res.status_code < 400
         return client

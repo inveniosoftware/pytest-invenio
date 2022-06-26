@@ -22,11 +22,33 @@ import os
 
 import pytest
 
-from .fixtures import UserFixture, _monkeypatch_response_class, app, \
-    app_config, appctx, base_app, base_client, broker_uri, browser, \
-    bucket_from_dir, celery_config, celery_config_ext, cli_runner, database, \
-    db, db_uri, default_handler, entry_points, es, es_clear, \
-    extra_entry_points, instance_path, location, mailbox, script_info
+from .fixtures import (
+    UserFixture,
+    _monkeypatch_response_class,
+    app,
+    app_config,
+    appctx,
+    base_app,
+    base_client,
+    broker_uri,
+    browser,
+    bucket_from_dir,
+    celery_config,
+    celery_config_ext,
+    cli_runner,
+    database,
+    db,
+    db_uri,
+    default_handler,
+    entry_points,
+    es,
+    es_clear,
+    extra_entry_points,
+    instance_path,
+    location,
+    mailbox,
+    script_info,
+)
 
 
 def pytest_generate_tests(metafunc):
@@ -45,17 +67,16 @@ def pytest_generate_tests(metafunc):
     browsers declared by the ``E2E_WEBDRIVER_BROWSERS`` environment variable.
     By default only Chrome is tested.
     """
-    if 'browser' in metafunc.fixturenames:
-        if os.environ.get('E2E', 'no').lower() != 'yes':
+    if "browser" in metafunc.fixturenames:
+        if os.environ.get("E2E", "no").lower() != "yes":
             pytest.skip(
                 "End-to-end tests skipped because E2E environment variable "
-                "was not set to 'yes'.")
+                "was not set to 'yes'."
+            )
 
         # Parameterize test based on list of browsers.
-        browsers = os.environ.get('E2E_WEBDRIVER_BROWSERS', 'Chrome').split()
-        metafunc.parametrize(
-            'browser', browsers, indirect=True, scope='function'
-        )
+        browsers = os.environ.get("E2E_WEBDRIVER_BROWSERS", "Chrome").split()
+        metafunc.parametrize("browser", browsers, indirect=True, scope="function")
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
