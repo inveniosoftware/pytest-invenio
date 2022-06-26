@@ -498,6 +498,7 @@ information.
       - sleep 3 # give xvfb some time to start
 """
 
-from .version import __version__
+
+__version__ = '1.4.11'
 
 __all__ = ('__version__', )
