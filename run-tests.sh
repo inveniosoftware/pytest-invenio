@@ -26,5 +26,4 @@ python -m sphinx.cmd.build -qnNW docs docs/_build/html
 eval "$(docker-services-cli up --search ${SEARCH:-elasticsearch} --env)"
 python -m pytest --runpytest=subprocess
 tests_exit_code=$?
-python -m sphinx.cmd.build -qnNW -b doctest docs docs/_build/doctest
 exit "$tests_exit_code"
