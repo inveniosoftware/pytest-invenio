@@ -11,8 +11,6 @@
 import json
 import os
 
-import pytest
-
 
 def test_version():
     """Test version import."""
@@ -326,22 +324,22 @@ def test_db(conftest_testdir):
         """
         from invenio_db import db
 
-        class User(db.Model):
+        class UserA(db.Model):
             id = db.Column(db.Integer, primary_key=True)
             username = db.Column(db.String(80), unique=True)
 
         def test_db1(db):
-            assert User.query.count() == 0
-            db.session.add(User(username='alice'))
+            assert UserA.query.count() == 0
+            db.session.add(UserA(username='alice'))
             db.session.commit()
-            assert User.query.count() == 1
+            assert UserA.query.count() == 1
 
         def test_db2(db):
-            assert User.query.count() == 0
-            db.session.add(User(username='alice'))
-            db.session.add(User(username='bob'))
+            assert UserA.query.count() == 0
+            db.session.add(UserA(username='alice'))
+            db.session.add(UserA(username='bob'))
             db.session.commit()
-            assert User.query.count() == 2
+            assert UserA.query.count() == 2
     """
     )
     conftest_testdir.runpytest().assert_outcomes(passed=2)
