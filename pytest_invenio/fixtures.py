@@ -378,55 +378,75 @@ def cli_runner(base_app):
     return cli_invoke
 
 
-def _es_create_indexes(current_search, current_search_client):
-    """Create all registered Elasticsearch indexes."""
-    from elasticsearch.exceptions import RequestError
+def _search_create_indexes(current_search, current_search_client):
+    """Create all registered search indexes."""
+    from invenio_search.engine import search
 
     try:
         list(current_search.create())
-    except RequestError:
+    except search.RequestError:
         list(current_search.delete(ignore=[404]))
         list(current_search.create())
     current_search_client.indices.refresh()
 
 
-def _es_delete_indexes(current_search):
-    """Delete all registered Elasticsearch indexes."""
+def _search_delete_indexes(current_search):
+    """Delete all registered search indexes."""
     list(current_search.delete(ignore=[404]))
 
 
 @pytest.fixture(scope="module")
-def es(appctx):
-    """Setup and teardown all registered Elasticsearch indices.
+def search(appctx):
+    """Setup and teardown all registered search indices.
 
     Scope: module
 
-    This fixture will create all registered indexes in Elasticsearch and remove
+    This fixture will create all registered indexes in search and remove
     once done. Fixtures that perform changes (e.g. index or remove documents),
-    should used the function-scoped :py:data:`es_clear` fixture to leave the
+    should used the function-scoped :py:data:`search_clear` fixture to leave the
     indexes clean for the following tests.
     """
     from invenio_search import current_search, current_search_client
 
-    _es_create_indexes(current_search, current_search_client)
+    _search_create_indexes(current_search, current_search_client)
     yield current_search_client
-    _es_delete_indexes(current_search)
+    _search_delete_indexes(current_search)
+
+
+@pytest.fixture(scope="module")
+def es(search):
+    """Alias for search fixture."""
+    warn(
+        "`es` fixture is deprecated, use `search` instead.",
+        DeprecationWarning,
+    )
+    yield search
 
 
 @pytest.fixture(scope="function")
-def es_clear(es):
-    """Clear Elasticsearch indices after test finishes (function scope).
+def search_clear(search):
+    """Clear search indices after test finishes (function scope).
 
     Scope: function
 
     This fixture rollback any changes performed to the indexes during a test,
-    in order to leave Elasticsearch in a clean state for the next test.
+    in order to leave search in a clean state for the next test.
     """
     from invenio_search import current_search, current_search_client
 
-    yield es
-    _es_delete_indexes(current_search)
-    _es_create_indexes(current_search, current_search_client)
+    yield search
+    _search_delete_indexes(current_search)
+    _search_create_indexes(current_search, current_search_client)
+
+
+@pytest.fixture(scope="function")
+def es_clear(search_clear):
+    """Alias for search_clear fixture."""
+    warn(
+        "`es_clear` fixture is deprecated, use `search_clear` instead.",
+        DeprecationWarning,
+    )
+    yield search_clear
 
 
 @pytest.fixture(scope="module")
@@ -520,13 +540,13 @@ def mailbox(base_app):
 
 
 @pytest.fixture(scope="module")
-def app(base_app, es, database):
-    """Invenio application with database and Elasticsearch.
+def app(base_app, search, database):
+    """Invenio application with database and search.
 
     Scope: module
 
     See also :py:data:`base_app` for an Invenio application fixture that
-    does not initialize database and Elasticsearch.
+    does not initialize database and search.
     """
     yield base_app
 

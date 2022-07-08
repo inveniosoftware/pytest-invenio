@@ -228,20 +228,20 @@ def test_clirunner_output(conftest_testdir):
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
-def test_es(conftest_testdir):
-    """Test Elasticsearch initialization."""
+def test_search(conftest_testdir):
+    """Test search initialization."""
     conftest_testdir.makepyfile(
         """
-        def test_es(es):
-            assert es.ping()
+        def test_search(search):
+            assert search.ping()
     """
     )
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
-def test_es_clear(conftest_testdir):
-    """Test Elasticsearch clearing."""
-    # Create an Elasticsearch mapping for Invenio-Search
+def test_search_clear(conftest_testdir):
+    """Test search clearing."""
+    # Create an search mapping for Invenio-Search
     conftest_testdir.mkpydir("data")
     conftest_testdir.mkpydir("data/v7")
     conftest_testdir.mkdir("data/v7/demo")
@@ -259,20 +259,20 @@ def test_es_clear(conftest_testdir):
     conftest_testdir.makepyfile(
         """
         import pytest
-        from elasticsearch.exceptions import NotFoundError
         from invenio_search import current_search_client, current_search
+        from invenio_search.engine import search as search_engine
 
         # Just a UUID
         doc_id = 'deadbeef-dae9-4c19-9b7c-49056374bc6c'
 
         @pytest.fixture(scope='module')
         def base_app(base_app):
-            # Registers the Elasticsearch mapping on the application
-            search = base_app.extensions['invenio-search']
-            search.register_mappings('demo', 'data')
+            # Registers the search mapping on the application
+            invenio_search = base_app.extensions['invenio-search']
+            invenio_search.register_mappings('demo', 'data')
             return base_app
 
-        def test_es1(es, es_clear):
+        def test_search1(search, search_clear):
             # Index a document
             current_search_client.index(
                 index='demo-default-v1.0.0',
@@ -290,10 +290,10 @@ def test_es_clear(conftest_testdir):
                 doc_type='_doc',
             )
 
-        def test_es2(es):
+        def test_search2(search):
             # Get the document create in test above (should not be possible)
             pytest.raises(
-                NotFoundError,
+                search_engine.NotFoundError,
                 current_search_client.get,
                 index='demo-default-v1.0.0',
                 id=doc_id,
