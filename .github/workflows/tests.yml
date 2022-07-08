@@ -31,8 +31,10 @@ jobs:
       matrix:
           python-version: [3.7, 3.8, 3.9]
           requirements-level: [pypi]
-          search-service: [elasticsearch7]
+          search-service: [opensearch1,elasticsearch7]
           include:
+          - search-service: opensearch1
+            SEARCH_EXTRAS: "opensearch1"
           - search-service: elasticsearch7
             SEARCH_EXTRAS: "elasticsearch7"
 

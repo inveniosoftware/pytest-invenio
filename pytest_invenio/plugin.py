@@ -48,6 +48,8 @@ from .fixtures import (
     location,
     mailbox,
     script_info,
+    search,
+    search_clear,
 )
 
 

@@ -216,7 +216,7 @@ The package provides three different application fixtures:
   pushes an application context onto the stack (i.e. makes ``current_app``
   work).
 * :py:data:`~fixtures.app`: Same as the basic application, but in addition it
-  initializes the database and Elasticsearch indices.
+  initializes the database and search indices.
 
 All three fixtures depend on the same user-provided (i.e. you must define it)
 fixture named ``create_app`` which must return an application factory (see
@@ -325,8 +325,8 @@ a transaction and rollback any changes by the end of the test. For instance:
 
     Take care! The :py:data:`~fixtures.db` fixture does not rollback other
     changes. If data, in addition to being added to the database, is also
-    indexed in Elasticsearch then you should clear the index explicitly using
-    e.g. :py:data:`~fixtures.es_clear`.
+    indexed in the search cluster then you should clear the index explicitly using
+    e.g. :py:data:`~fixtures.search_clear`.
 
 Performance considerations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -336,30 +336,30 @@ overhead, thus be careful not to indirectly depend on the database fixtures in
 a file unless it is really necessary (e.g. via the :py:data:`~fixtures.app`
 fixture).
 
-Elasticsearch testing
+Search testing
 ---------------------
 Pytest-Invenio depends on Invenio-Search and any mappings registered on
-Invenio-Search will be created if you depend on the :py:data:`~fixtures.es`
+Invenio-Search will be created if you depend on the :py:data:`~fixtures.search`
 fixture. The fixture is module scoped, meaning that any fixture you write to
 e.g. load test data should likely also be module scoped.
 
 Clearing changes
 ~~~~~~~~~~~~~~~~
 Unlike the database fixture, which automatically rollback changes, you must
-explicitly depend on the :py:data:`~fixtures.es_clear` fixture if you makes
+explicitly depend on the :py:data:`~fixtures.search_clear` fixture if you makes
 changes to the indexes. This ensures that you leave the indexes in a clean
-state for the next test. The :py:data:`~fixtures.es_clear` fixture will however
+state for the next test. The :py:data:`~fixtures.search_clear` fixture will however
 delete and recreate the indexes, and thus comes with a performance penalty if
 used.
 
 .. code-block:: python
 
-    def test_es1(es_clear):
+    def test_search1(search_clear):
         # ...
 
 Performance considerations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-As for the database fixtures, Elasticsearch indexes are deleted and recreated
+As for the database fixtures, search indices are deleted and recreated
 for each test file (due to module scoped fixture). Thus be careful not to
 indirectly depend on the database fixtures in a file unless it is really
 necessary (e.g. via the :py:data:`~fixtures.app` fixture).
