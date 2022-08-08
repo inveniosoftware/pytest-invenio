@@ -267,7 +267,7 @@ def base_app(create_app, app_config, request, default_handler):
     create_app = getattr(request.module, "create_app", create_app)
     app_ = create_app(**app_config)
 
-    def delete_user_from_cache(exception):
+    def delete_user_from_g(exception):
         """Delete user from `flask.g` when the request is tearing down.
 
         Flask-login==0.6.2 changed the way the user is saved i.e uses `flask.g`.
@@ -285,7 +285,7 @@ def base_app(create_app, app_config, request, default_handler):
         if "_login_user" in g:
             del g._login_user
 
-    app_.teardown_request(delete_user_from_cache)
+    app_.teardown_request(delete_user_from_g)
 
     # See documentation for default_handler
     if default_handler:
