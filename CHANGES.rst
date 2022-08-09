@@ -8,6 +8,14 @@
 Changes
 =======
 
+Version 1.4.13 (released 2022-08-09)
+
+- Fix pycodestyle dependency
+
+Version 1.4.12 (released 2022-08-08)
+
+- Fix flask-login dependency
+
 Version 1.4.11 (released 2022-05-05)
 
 - Upper pin Selenium dependency, v4 drops support for Python 3.7.
