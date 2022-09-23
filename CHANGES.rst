@@ -8,6 +8,13 @@
 Changes
 =======
 
+Version 2.0.0 (released 2022-09-23)
+
+- Use invenio-search v2 and replaces Elasticsearch with OpenSearch, including
+  fixture names.
+- Deprecate previous fixtures named with `es` prefix.
+- Remove upper pin of pytest.
+
 Version 1.4.13 (released 2022-08-09)
 
 - Fix pycodestyle dependency
