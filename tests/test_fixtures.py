@@ -279,7 +279,6 @@ def test_search_clear(conftest_testdir):
                 id=doc_id,
                 body={'title': 'Test'},
                 op_type='create',
-                doc_type='_doc',
             )
             # Wait for document to be available
             current_search.flush_and_refresh('demo-default-v1.0.0')
@@ -287,7 +286,6 @@ def test_search_clear(conftest_testdir):
             current_search_client.get(
                 index='demo-default-v1.0.0',
                 id=doc_id,
-                doc_type='_doc',
             )
 
         def test_search2(search):
@@ -297,7 +295,6 @@ def test_search_clear(conftest_testdir):
                 current_search_client.get,
                 index='demo-default-v1.0.0',
                 id=doc_id,
-                doc_type='_doc',
             )
             # But the index should exist
             assert current_search_client.indices.exists(
