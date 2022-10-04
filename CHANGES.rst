@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 1.4.15 (released 2022-10-04)
+
+- Pin docker-services-cli<0.5.0, which drops Elasticsearch v6.
+
+Version 1.4.14 (yanked)
+
 Version 1.4.13 (released 2022-08-09)
 
 - Fix pycodestyle dependency
