@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 2.1.1 (released 2022-10-25)
+
+- pin pytest version
+
+
 Version 1.4.15 (released 2022-10-04)
 
 - Pin docker-services-cli<0.5.0, which drops Elasticsearch v6.
