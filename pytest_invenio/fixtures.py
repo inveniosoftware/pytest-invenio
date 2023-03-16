@@ -211,6 +211,8 @@ def app_config(db_uri, broker_uri, celery_config_ext):
         # Allow testing OAuth without SSL.
         OAUTHLIB_INSECURE_TRANSPORT=True,
         OAUTH2_CACHE_TYPE="simple",
+        # Disable rate-limiting
+        RATELIMIT_ENABLED=False,
         # Set test secret keys
         SECRET_KEY="test-secret-key",
         SECURITY_PASSWORD_SALT="test-secret-key",
