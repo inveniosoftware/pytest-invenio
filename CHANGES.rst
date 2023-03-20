@@ -8,10 +8,13 @@
 Changes
 =======
 
+Version 2.1.2 (released 2023-03-20)
+
+- disable request rate-limiting
+
 Version 2.1.1 (released 2022-10-25)
 
 - pin pytest version
-
 
 Version 1.4.15 (released 2022-10-04)
 
