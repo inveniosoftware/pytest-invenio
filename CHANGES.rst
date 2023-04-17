@@ -1,12 +1,16 @@
 ..
     This file is part of pytest-invenio.
-    Copyright (C) 2018-2022 CERN.
+    Copyright (C) 2018-2023 CERN.
 
     pytest-invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version 2.1.3 (released 2023-04-13)
+
+- yanked, because of an incompatibility with Flask-SQLAlchemy v3.
 
 Version 2.1.2 (released 2023-03-20)
 
