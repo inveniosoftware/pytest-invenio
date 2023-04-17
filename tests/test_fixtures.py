@@ -319,11 +319,11 @@ def test_db(conftest_testdir):
     """Test database creation and initialization."""
     conftest_testdir.makepyfile(
         """
-        from invenio_db import db as _db
+        from invenio_db import db
 
-        class UserA(_db.Model):
-            id = _db.Column(_db.Integer, primary_key=True)
-            username = _db.Column(_db.String(80), unique=True)
+        class UserA(db.Model):
+            id = db.Column(db.Integer, primary_key=True)
+            username = db.Column(db.String(80), unique=True)
 
         def test_db1(db):
             assert UserA.query.count() == 0

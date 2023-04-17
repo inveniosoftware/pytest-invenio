@@ -488,13 +488,22 @@ def db(database):
 
     connection = database.engine.connect()
     transaction = connection.begin()
-    old_session = database.session
 
-    # Create a new session and assign it to the current db session.
-    # The new session is scoped and bound to the `connection`.
     options = dict(bind=connection, binds={})
-    session_factory = sa.orm.sessionmaker(**options)
-    session = sa.orm.scoped_session(session_factory)
+    session = database.create_scoped_session(options=options)
+
+    session.begin_nested()
+
+    # `session` is actually a scoped_session. For the `after_transaction_end`
+    # event, we need a session instance to listen for, hence the `session()`
+    # call.
+    @sa.event.listens_for(session(), "after_transaction_end")
+    def restart_savepoint(sess, trans):
+        if trans.nested and not trans._parent.nested:
+            session.expire_all()
+            session.begin_nested()
+
+    old_session = database.session
     database.session = session
 
     yield database
