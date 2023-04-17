@@ -8,10 +8,6 @@
 Changes
 =======
 
-Version 2.1.3 (released 2023-04-13)
-
-- db: upgrade flask-sqlalchemy
-
 Version 2.1.2 (released 2023-03-20)
 
 - disable request rate-limiting
