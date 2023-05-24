@@ -118,7 +118,7 @@ class UserFixtureBase:
                 from flask_security import logout_user
 
                 login_user(self.user)
-                identity = Identity(self.id)
+                identity = Identity(self._user.id)
                 identity_changed.send(self._app, identity=identity)
                 self._identity = deepcopy(identity)
                 # Clean up - we just want the identity object.
