@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 2.1.4 (released 2023-06-02)
+
+- user fixture: use identity ID as int
+
 Version 2.1.3 (released 2023-04-13)
 
 - yanked, because of an incompatibility with Flask-SQLAlchemy v3.
