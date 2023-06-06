@@ -50,6 +50,7 @@ from .fixtures import (
     script_info,
     search,
     search_clear,
+    test_alembic,
 )
 
 
