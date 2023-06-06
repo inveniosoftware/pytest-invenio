@@ -887,8 +887,11 @@ def test_alembic():
     implements that behaviour by upgrading per revision_id instead of upgrade from scratch to the latest.
     """
 
-    def _test_alembic(app, db, module_name, downgrade_target="base"):
-        """Test alembic recipes for a concrete module."""
+    def _test_alembic(app, db, module_name, downgrade_targets=["base"]):
+        """Test alembic recipes for a concrete module.
+
+        Order in downgrade_targets is important as the revision_ids will be executed in that order when downgrading.
+        """
 
         def _sort_revision_ids(scripts_list):
             """Sorts the scripts based on the previous and next revisions and returns a list of sorted revision ids."""
@@ -924,10 +927,11 @@ def test_alembic():
                 ext.alembic.upgrade(target=revision_id)
             ext.alembic.upgrade()  # Update all the rest of the branches to the latest heads
             assert not ext.alembic.compare_metadata()
-            ext.alembic.downgrade(target=downgrade_target)
+            for downgrade_target in downgrade_targets:
+                ext.alembic.downgrade(target=downgrade_target)
             for revision_id in revision_ids:
                 ext.alembic.upgrade(target=revision_id)
-
+            ext.alembic.upgrade()  # Update all the rest of the branches to the latest heads
             assert not ext.alembic.compare_metadata()
 
     return _test_alembic
