@@ -38,6 +38,7 @@ from .fixtures import (
     cli_runner,
     database,
     db,
+    db_session_options,
     db_uri,
     default_handler,
     entry_points,

@@ -475,7 +475,24 @@ def database(appctx):
 
 
 @pytest.fixture(scope="function")
-def db(database):
+def db_session_options():
+    """Database session options.
+
+    Use to override options like ``expire_on_commit`` for the database session, which
+    helps with ``sqlalchemy.orm.exc.DetachedInstanceError`` when models are not bound
+    to the session between transactions/requests/service-calls.
+
+    .. code-block:: python
+
+        @pytest.fixture(scope='function')
+        def db_session_options():
+            return dict(expire_on_commit=False)
+    """
+    return {}
+
+
+@pytest.fixture(scope="function")
+def db(database, db_session_options):
     """Creates a new database session for a test.
 
     Scope: function
@@ -489,7 +506,11 @@ def db(database):
     connection = database.engine.connect()
     transaction = connection.begin()
 
-    options = dict(bind=connection, binds={})
+    options = dict(
+        bind=connection,
+        binds={},
+        **db_session_options,
+    )
     session = database.create_scoped_session(options=options)
 
     session.begin_nested()
