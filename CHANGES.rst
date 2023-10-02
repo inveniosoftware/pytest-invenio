@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 2.1.5 (released 2023-10-02)
+
+- installation: pin Flask ``<2.3.0``.
+
 Version 2.1.4 (released 2023-06-02)
 
 - user fixture: use identity ID as int
