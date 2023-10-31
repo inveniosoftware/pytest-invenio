@@ -11,6 +11,8 @@
 import json
 import os
 
+import pytest
+
 
 def test_version():
     """Test version import."""
@@ -402,6 +404,7 @@ def test_browser_skipped(conftest_testdir):
     conftest_testdir.runpytest().assert_outcomes(skipped=1)
 
 
+@pytest.mark.skip(reason="outdated library")
 def test_browser(conftest_testdir, monkeypatch):
     """Test live server and selenium."""
     monkeypatch.setenv("E2E", "yes")
