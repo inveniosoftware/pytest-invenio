@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 2.1.6 (released 2023-10-31)
+
+- Add ``db_session_options`` fixture.
+
 Version 2.1.5 (released 2023-10-02)
 
 - installation: pin Flask ``<2.3.0``.
