@@ -466,6 +466,19 @@ def database(appctx):
 
     if not database_exists(str(db_.engine.url)):
         create_database(str(db_.engine.url))
+
+    # Use unlogged tables for PostgreSQL (see https://github.com/sqlalchemy/alembic/discussions/1108)
+    if db_.engine.name == "postgresql":
+        from sqlalchemy.ext.compiler import compiles
+        from sqlalchemy.schema import CreateTable
+
+        @compiles(CreateTable)
+        def _compile_unlogged(element, compiler, **kwargs):
+            return compiler.visit_create_table(element).replace(
+                "CREATE TABLE ",
+                "CREATE UNLOGGED TABLE ",
+            )
+
     db_.create_all()
 
     yield db_
