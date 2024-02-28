@@ -499,6 +499,6 @@ information.
 """
 
 
-__version__ = "2.1.7"
+__version__ = "2.2.0"
 
 __all__ = ("__version__",)

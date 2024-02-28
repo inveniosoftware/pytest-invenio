@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 2.2.0 (released 2024-02-28)
+
+- setup: bump coverage package
+- installation: add GitHub action annotations
+
 Version 2.1.7 (released 2024-01-29)
 
 - fixtures: use unlogged tables for PostgreSQL
