@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 2.2.1 (released 2024-06-27)
+
+- installation: pin importlib-metadata ``<8.0.0``
+
 Version 2.2.0 (released 2024-02-28)
 
 - setup: bump coverage package
