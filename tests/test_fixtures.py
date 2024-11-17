@@ -89,6 +89,32 @@ def test_broker_uri_env(testdir, monkeypatch):
     monkeypatch.undo()
 
 
+def test_search_hosts(testdir):
+    """Test default search hosts."""
+    testdir.makepyfile(
+        """
+        import os
+        def test_search_hosts(search_hosts):
+            assert "SEARCH_HSOTS" not in os.environ
+            assert search_hosts == [{'host': 'localhost', 'port': 9200}]
+    """
+    )
+    testdir.runpytest().assert_outcomes(passed=1)
+
+
+def test_search_hosts_env(testdir, monkeypatch):
+    """Test search hosts defined in environment variable."""
+    monkeypatch.setenv("SEARCH_HOSTS", "[{'host': 'host-from-env', 'port': 49200}]")
+    testdir.makepyfile(
+        """
+        def test_search_hosts(search_hosts):
+            assert search_hosts == [{'host': 'host-from-env', 'port': 49200}]
+    """
+    )
+    testdir.runpytest().assert_outcomes(passed=1)
+    monkeypatch.undo()
+
+
 def test_app_config(testdir):
     """Test application and celery config."""
     testdir.makepyfile(
@@ -112,7 +138,7 @@ def test_app_config(testdir):
             })
             return app_config
 
-        def test_app_config(app_config, db_uri, broker_uri):
+        def test_app_config(app_config, db_uri):
             assert app_config['SQLALCHEMY_DATABASE_URI'] == db_uri
             assert app_config['MYSTUFF']
     """

@@ -22,7 +22,7 @@ import os
 
 import pytest
 
-from .fixtures import (
+from .fixtures import (  # noqa
     UserFixture,
     _monkeypatch_response_class,
     app,
@@ -51,6 +51,7 @@ from .fixtures import (
     script_info,
     search,
     search_clear,
+    search_hosts,
 )
 
 

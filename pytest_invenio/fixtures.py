@@ -9,6 +9,7 @@
 
 """Pytest fixtures for Invenio."""
 
+import ast
 import os
 import shutil
 import sys
@@ -154,7 +155,22 @@ overwritten in a specific test module:
 
 
 @pytest.fixture(scope="module")
-def app_config(db_uri, broker_uri, celery_config_ext):
+def search_hosts():
+    """Search hosts (default to localhost:9200).
+
+    Scope: module
+
+    The search hosts can be overwritten by setting the ``SEARCH_HOSTS``
+    environment variable to a list of dictionaries with ``host`` and ``port`` keys.
+    """
+    if "SEARCH_HOSTS" in os.environ:
+        yield ast.literal_eval(os.environ["SEARCH_HOSTS"])
+    else:
+        yield [{"host": "localhost", "port": 9200}]
+
+
+@pytest.fixture(scope="module")
+def app_config(db_uri, broker_uri, celery_config_ext, search_hosts):
     """Application configuration fixture.
 
     Scope: module
@@ -219,6 +235,8 @@ def app_config(db_uri, broker_uri, celery_config_ext):
         # Database configuration
         SQLALCHEMY_DATABASE_URI=db_uri,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        # Search configuration
+        SEARCH_HOSTS=search_hosts,
         # Flask testing mode
         TESTING=True,
         # Disable CRSF protection in WTForms
