@@ -20,65 +20,14 @@ on:
       - maint-*
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '0 3 * * 6'
+    - cron: "0 3 * * 6"
   workflow_dispatch:
     inputs:
       reason:
-        description: 'Reason'
+        description: "Reason"
         required: false
-        default: 'Manual trigger'
+        default: "Manual trigger"
 
 jobs:
-  Tests:
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-          python-version: [3.7, 3.8, 3.9]
-          requirements-level: [pypi]
-          search-service: [opensearch2,elasticsearch7]
-          include:
-          - search-service: opensearch2
-            SEARCH_EXTRAS: "opensearch2"
-          - search-service: elasticsearch7
-            SEARCH_EXTRAS: "elasticsearch7"
-
-    env:
-      SEARCH: ${{ matrix.search-service }}
-      EXTRAS: tests,${{ matrix.SEARCH_EXTRAS }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Setup Selenium
-        run: |
-          E2E_OUTPUT=base64
-          PATH=$PATH:$HOME/webdrivers
-          if [ ! -f $HOME/webdrivers/chromedriver ]; then wget https://chromedriver.storage.googleapis.com/2.31/chromedriver_linux64.zip -P $HOME/webdrivers; unzip -d $HOME/webdrivers $HOME/webdrivers/chromedriver_linux64.zip; fi
-
-      - name: Generate dependencies
-        run: |
-          pip install wheel requirements-builder
-          requirements-builder -e "$EXTRAS" --level=${{ matrix.requirements-level }} setup.py > .${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt
-
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('.${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt') }}
-
-      - name: Install dependencies
-        run: |
-          pip install -r .${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt -c constraints-${{ matrix.requirements-level }}.txt
-          pip install ".[$EXTRAS]"
-          pip freeze
-          docker --version
-          docker-compose --version
-
-      - name: Run tests
-        run: |
-          ./run-tests.sh
+  Python:
+    uses: inveniosoftware/workflows/.github/workflows/tests-python.yml@master
