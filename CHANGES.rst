@@ -1,12 +1,19 @@
 ..
     This file is part of pytest-invenio.
     Copyright (C) 2018-2024 CERN.
+    Copyright (C) 2024 Graz University of Technology.
 
     pytest-invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version 3.0.0 (released 2024-12-02)
+
+- setup: remove pytest pin
+- global: add compatibility to sqlalchemy >= 2.0
+- fixtures: apply new sqlalchemy session rollback handling
 
 Version 2.2.1 (released 2024-06-27)
 
