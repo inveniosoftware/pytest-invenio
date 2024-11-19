@@ -2,6 +2,7 @@
 #
 # This file is part of pytest-invenio.
 # Copyright (C) 2017-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -337,7 +338,7 @@ def test_database(conftest_testdir):
     conftest_testdir.makepyfile(
         """
         def test_database(database, db_uri):
-            assert str(database.engine.url) == db_uri
+            assert str(database.engine.url.render_as_string(hide_password=False)) == db_uri
     """
     )
     conftest_testdir.runpytest().assert_outcomes(passed=1)
@@ -354,17 +355,17 @@ def test_db(conftest_testdir):
             username = db.Column(db.String(80), unique=True)
 
         def test_db1(db):
-            assert UserA.query.count() == 0
+            assert db.session.query(UserA).count() == 0
             db.session.add(UserA(username='alice'))
             db.session.commit()
-            assert UserA.query.count() == 1
+            assert db.session.query(UserA).count() == 1
 
         def test_db2(db):
-            assert UserA.query.count() == 0
+            assert db.session.query(UserA).count() == 0
             db.session.add(UserA(username='alice'))
             db.session.add(UserA(username='bob'))
             db.session.commit()
-            assert UserA.query.count() == 2
+            assert db.session.query(UserA).count() == 2
     """
     )
     conftest_testdir.runpytest().assert_outcomes(passed=2)
@@ -381,7 +382,7 @@ def test_app(conftest_testdir):
             id = db.Column(db.Integer, primary_key=True)
 
         def test_app(app):
-            assert Place.query.count() == 0
+            assert db.session.query(Place).count() == 0
             assert current_search_client.ping()
     """
     )
@@ -564,7 +565,7 @@ def test_entrypoint_pkg_resources(testdir):
 
         def test_app(base_app, db):
             from mock_module import Place
-            assert Place.query.count() == 0
+            assert db.session.query(Place).count() == 0
 
         def test_extras(base_app, db):
             for ep in db_entry_points():
@@ -627,7 +628,7 @@ def test_entrypoint_importlib(testdir):
 
         def test_app(base_app, db):
             from mock_module import Place
-            assert Place.query.count() == 0
+            assert db.session.query(Place).count() == 0
 
         def test_extras(base_app, db):
             for ep in db_entry_points():

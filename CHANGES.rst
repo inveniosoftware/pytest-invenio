@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 3.0.0 (released 2024-11-19)
+
+- setup: remove pytest pin
+- global: add compatibility to sqlalchemy >= 2.0
+- fixtures: apply new sqlalchemy session rollback handling
+
 Version 2.2.1 (released 2024-06-27)
 
 - installation: pin importlib-metadata ``<8.0.0``
