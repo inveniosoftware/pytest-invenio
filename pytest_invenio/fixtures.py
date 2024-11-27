@@ -3,6 +3,7 @@
 # This file is part of pytest-invenio.
 # Copyright (C) 2017-2024 CERN.
 # Copyright (C) 2018 Esteban J. G. Garbancho.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -284,6 +285,7 @@ def base_app(create_app, app_config, request, default_handler):
     """
     # Use create_app from the module if defined, otherwise use default
     # create_app fixture.
+
     create_app = getattr(request.module, "create_app", create_app)
     app_ = create_app(**app_config)
 
@@ -482,8 +484,8 @@ def database(appctx):
     from invenio_db import db as db_
     from sqlalchemy_utils.functions import create_database, database_exists
 
-    if not database_exists(str(db_.engine.url)):
-        create_database(str(db_.engine.url))
+    if not database_exists(str(db_.engine.url.render_as_string(hide_password=False))):
+        create_database(str(db_.engine.url.render_as_string(hide_password=False)))
 
     # Use unlogged tables for PostgreSQL (see https://github.com/sqlalchemy/alembic/discussions/1108)
     if db_.engine.name == "postgresql":
@@ -532,36 +534,39 @@ def db(database, db_session_options):
     fixture will set a save point and rollback all changes performed during
     the test (this is much faster than recreating the entire database).
     """
-    import sqlalchemy as sa
+    from flask_sqlalchemy.session import Session as FlaskSQLAlchemySession
+
+    class PytestInvenioSession(FlaskSQLAlchemySession):
+        def get_bind(self, mapper=None, clause=None, bind=None, **kwargs):
+            if self.bind:
+                return self.bind
+            return super().get_bind(mapper=mapper, clause=clause, bind=bind, **kwargs)
+
+        def rollback(self) -> None:
+            if self._transaction is None:
+                pass
+            else:
+                self._transaction.rollback(_to_root=False)
 
     connection = database.engine.connect()
-    transaction = connection.begin()
+    connection.begin()
 
     options = dict(
         bind=connection,
         binds={},
         **db_session_options,
+        class_=PytestInvenioSession,
     )
-    session = database.create_scoped_session(options=options)
+    session = database._make_scoped_session(options=options)
 
     session.begin_nested()
-
-    # `session` is actually a scoped_session. For the `after_transaction_end`
-    # event, we need a session instance to listen for, hence the `session()`
-    # call.
-    @sa.event.listens_for(session(), "after_transaction_end")
-    def restart_savepoint(sess, trans):
-        if trans.nested and not trans._parent.nested:
-            session.expire_all()
-            session.begin_nested()
 
     old_session = database.session
     database.session = session
 
     yield database
 
-    session.remove()
-    transaction.rollback()
+    session.rollback()
     connection.close()
     database.session = old_session
 
@@ -822,6 +827,12 @@ class MockImportlibDistribution(importlib_metadata.Distribution):
                     value=value.strip(),
                     group=group,
                 )
+
+    def read_text(self, *args, **kwargs):
+        """Implement abstract method."""
+
+    def locate_file(self, *args, **kwargs):
+        """Implement abstract method."""
 
 
 @pytest.fixture(scope="module")
