@@ -357,14 +357,12 @@ def test_db(conftest_testdir):
         def test_db1(db):
             assert db.session.query(UserA).count() == 0
             db.session.add(UserA(username='alice'))
-            db.session.commit()
             assert db.session.query(UserA).count() == 1
 
         def test_db2(db):
             assert db.session.query(UserA).count() == 0
             db.session.add(UserA(username='alice'))
             db.session.add(UserA(username='bob'))
-            db.session.commit()
             assert db.session.query(UserA).count() == 2
     """
     )

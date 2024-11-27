@@ -534,7 +534,6 @@ def db(database, db_session_options):
     fixture will set a save point and rollback all changes performed during
     the test (this is much faster than recreating the entire database).
     """
-
     from flask_sqlalchemy.session import Session as FlaskSQLAlchemySession
 
     class PytestInvenioSession(FlaskSQLAlchemySession):
@@ -828,6 +827,12 @@ class MockImportlibDistribution(importlib_metadata.Distribution):
                     value=value.strip(),
                     group=group,
                 )
+
+    def read_text(self, *args, **kwargs):
+        """Implement abstract method."""
+
+    def locate_file(self, *args, **kwargs):
+        """Implement abstract method."""
 
 
 @pytest.fixture(scope="module")
