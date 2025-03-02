@@ -3,7 +3,7 @@
 # This file is part of pytest-invenio.
 # Copyright (C) 2017-2024 CERN.
 # Copyright (C) 2018 Esteban J. G. Garbancho.
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -67,6 +67,15 @@ def instance_path():
     yield path
     os.environ.pop("INVENIO_INSTANCE_PATH", None)
     shutil.rmtree(path)
+
+
+@pytest.fixture(scope="module")
+def cache_uri():
+    """Cache uri."""
+    if "CACHE_REDIS_URL" in os.environ:
+        yield os.environ["CACHE_REDIS_URL"]
+    else:
+        yield None
 
 
 @pytest.fixture(scope="module")

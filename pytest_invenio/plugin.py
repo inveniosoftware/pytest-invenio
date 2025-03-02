@@ -3,6 +3,7 @@
 # This file is part of pytest-invenio.
 # Copyright (C) 2017-2018 CERN.
 # Copyright (C) 2018 Northwestern University, Feinberg School of Medicine,
+# Copyright (C) 2025 Graz University of Technology.
 # Galter Health Sciences Library.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
@@ -33,6 +34,7 @@ from .fixtures import (  # noqa
     broker_uri,
     browser,
     bucket_from_dir,
+    cache_uri,
     celery_config,
     celery_config_ext,
     cli_runner,
