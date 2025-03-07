@@ -180,7 +180,7 @@ def search_hosts():
 
 
 @pytest.fixture(scope="module")
-def app_config(db_uri, broker_uri, celery_config_ext, search_hosts):
+def app_config(db_uri, broker_uri, celery_config_ext, search_hosts, cache_uri):
     """Application configuration fixture.
 
     Scope: module
@@ -230,6 +230,9 @@ def app_config(db_uri, broker_uri, celery_config_ext, search_hosts):
         ),
         # Broker configuration
         BROKER_URL=broker_uri,
+        # Cache configuration
+        CACHE_REDIS_URL=cache_uri,
+        ACCOUNTS_SESSION_REDIS_URL=cache_uri,
         # Disable Flask-DebugToolbar if installed.
         DEBUG_TB_ENABLED=False,
         # Disable mail sending.
