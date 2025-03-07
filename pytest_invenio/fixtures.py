@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of pytest-invenio.
-# Copyright (C) 2017-2024 CERN.
+# Copyright (C) 2017-2025 CERN.
 # Copyright (C) 2018 Esteban J. G. Garbancho.
 # Copyright (C) 2024-2025 Graz University of Technology.
 #

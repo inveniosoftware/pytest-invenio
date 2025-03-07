@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of pytest-invenio.
-# Copyright (C) 2017-2018 CERN.
+# Copyright (C) 2017-2025 CERN.
 # Copyright (C) 2018 Northwestern University, Feinberg School of Medicine,
 # Copyright (C) 2025 Graz University of Technology.
 # Galter Health Sciences Library.

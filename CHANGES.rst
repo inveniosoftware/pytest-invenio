@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version v3.1.0 (released 2025-03-07)
+
+- fixtures: add fixture for ``cache_uri``
+
 Version 3.0.0 (released 2024-12-02)
 
 - setup: remove pytest pin
