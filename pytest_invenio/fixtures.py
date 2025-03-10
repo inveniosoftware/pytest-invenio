@@ -122,7 +122,7 @@ def _celery_config():
         CELERY_TASK_ALWAYS_EAGER=True,
         CELERY_CACHE_BACKEND="memory",
         CELERY_TASK_EAGER_PROPAGATES_EXCEPTIONS=True,
-        CELERY_RESULT_BACKEND="cache",
+        CELERY_RESULT_BACKEND="rpc://",
     )
 
     try:
@@ -230,6 +230,7 @@ def app_config(db_uri, broker_uri, celery_config_ext, search_hosts, cache_uri):
         ),
         # Broker configuration
         BROKER_URL=broker_uri,
+        CELERY_BROKER_URL=broker_uri,  # For Celery 4
         # Cache configuration
         CACHE_REDIS_URL=cache_uri,
         ACCOUNTS_SESSION_REDIS_URL=cache_uri,
