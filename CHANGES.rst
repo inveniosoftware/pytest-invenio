@@ -9,6 +9,16 @@
 Changes
 =======
 
+Version v3.2.0 (released 2025-03-30)
+
+- user: add `base_url` parameter for user auth client calls
+    * Adds a `base_url` parameter to the UserFixtureBase constructor. This
+      allows to make sure that auth calls like login and logout are
+      explicitly associated with the correct domain when needed. This is
+      avoid cookie domain inconsistencies intorduced by Flask v3 and
+      Werkzeug's v2.3 new default behavior for cookie management in the test
+      client.
+
 Version v3.1.0 (released 2025-03-07)
 
 - fixtures: add fixture for ``cache_uri``
