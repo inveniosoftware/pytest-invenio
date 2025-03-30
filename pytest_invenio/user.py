@@ -25,6 +25,7 @@ class UserFixtureBase:
         confirmed=True,
         user_profile=None,
         preferences=None,
+        base_url="",
     ):
         """Constructor."""
         self._username = username
@@ -37,6 +38,7 @@ class UserFixtureBase:
         self._identity = None
         self._user = None
         self._client = None
+        self._base_url = base_url
 
     #
     # Creation
@@ -111,7 +113,7 @@ class UserFixtureBase:
             from flask_principal import Identity, identity_changed
 
             with self._app.test_request_context():
-                # Simulate a full login -  we do not use flask-security's
+                # Simulate a full login - we do not use flask-security's
                 # login_user because it adds login ips/timestamps on every
                 # login
                 from flask_login import login_user
@@ -166,9 +168,8 @@ class UserFixtureBase:
         if logout:
             self._logout(client, base_path)
         res = client.post(
-            f"{base_path}login",
+            f"{self._base_url}{base_path}login",
             data=dict(email=self.email, password=self.password),
-            environ_base={"REMOTE_ADDR": "127.0.0.1"},
             follow_redirects=True,
         )
         assert res.status_code == 200
@@ -176,6 +177,6 @@ class UserFixtureBase:
 
     def _logout(self, client, base_path):
         """Logout the client."""
-        res = client.get(f"{base_path}logout")
+        res = client.get(f"{self._base_url}{base_path}logout")
         assert res.status_code < 400
         return client
