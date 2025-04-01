@@ -23,7 +23,7 @@ trap cleanup EXIT
 
 python -m check_manifest
 python -m sphinx.cmd.build -qnNW docs docs/_build/html
-eval "$(docker-services-cli up --search ${SEARCH:-opensearch} --env)"
+eval "$(docker-services-cli up --search ${SEARCH:-opensearch2} --env)"
 python -m pytest --runpytest=subprocess
 tests_exit_code=$?
 exit "$tests_exit_code"
