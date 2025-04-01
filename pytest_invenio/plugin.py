@@ -2,7 +2,7 @@
 #
 # This file is part of pytest-invenio.
 # Copyright (C) 2017-2025 CERN.
-# Copyright (C) 2018 Northwestern University, Feinberg School of Medicine,
+# Copyright (C) 2018-2025 Northwestern University.
 # Copyright (C) 2025 Graz University of Technology.
 # Galter Health Sciences Library.
 #
@@ -54,6 +54,7 @@ from .fixtures import (  # noqa
     search,
     search_clear,
     search_hosts,
+    set_app_config_fn_scoped,
 )
 
 
