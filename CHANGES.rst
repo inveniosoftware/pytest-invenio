@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version v3.3.0 (released 2025-04-02)
+
+- fixtures: add set_app_config_fn_scoped
+
 Version v3.2.0 (released 2025-03-30)
 
 - user: add `base_url` parameter for user auth client calls
