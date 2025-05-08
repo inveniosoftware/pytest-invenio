@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 2.2.2 (released 2025-05-08)
+
+- ci: use reusable workflows
+- installation: pin snowballstemmer to <3.x
+
 Version 2.2.1 (released 2024-06-27)
 
 - installation: pin importlib-metadata ``<8.0.0``
