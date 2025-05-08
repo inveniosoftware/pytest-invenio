@@ -9,6 +9,13 @@
 Changes
 =======
 
+Version v3.3.1 (released 2025-05-08)
+
+- installation: pin snowballstemmer to <3.x
+    * ``snowballstemmer`` is dependency of the deprecated/unmaintained
+      ``pydocstyle`` module. The v3.0.0 release of ``snowballstemmer``
+      introduces a breaking change.
+
 Version v3.3.0 (released 2025-04-02)
 
 - fixtures: add set_app_config_fn_scoped
