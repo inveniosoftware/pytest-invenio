@@ -2,7 +2,7 @@
 #
 # This file is part of pytest-invenio.
 # Copyright (C) 2017-2018 CERN.
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 # Copyright (C) 2025 Northwestern University.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
@@ -15,11 +15,11 @@ import os
 
 import pytest
 
+from pytest_invenio import __version__
+
 
 def test_version():
     """Test version import."""
-    from pytest_invenio import __version__
-
     assert __version__
 
 
@@ -513,7 +513,7 @@ def test_bucket_from_dir(conftest_testdir):
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
-def test_entrypoint_pkg_resources(testdir):
+def test_entrypoint_invenio_base(testdir):
     """Test database creation and initialization."""
     testdir.makeconftest(
         """
@@ -537,13 +537,13 @@ def test_entrypoint_pkg_resources(testdir):
     testdir.makepyfile(
         mock_module="""
         from invenio_db import db
-        from pkg_resources import iter_entry_points
+        from invenio_base.utils import entry_points
 
         class Place(db.Model):
             id = db.Column(db.Integer, primary_key=True)
 
         def db_entry_points():
-            return iter_entry_points('invenio_db.models')
+            return entry_points('invenio_db.models')
     """
     )
     testdir.makepyfile(
@@ -600,7 +600,7 @@ def test_entrypoint_importlib(testdir):
     testdir.makepyfile(
         mock_module="""
         from invenio_db import db
-        from importlib_metadata import entry_points
+        from invenio_base.utils import entry_points
 
         class Place(db.Model):
             id = db.Column(db.Integer, primary_key=True)
