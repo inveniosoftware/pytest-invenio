@@ -11,15 +11,15 @@
 """Pytest fixtures for Invenio."""
 
 import ast
+import importlib.metadata
 import os
 import shutil
 import sys
 import tempfile
 from datetime import datetime
+from importlib.metadata import PackageNotFoundError, version
 from warnings import warn
 
-import importlib_metadata
-import pkg_resources
 import pytest
 from pytest_flask.plugin import _make_test_response_class
 from selenium import webdriver
@@ -126,14 +126,14 @@ def _celery_config():
     )
 
     try:
-        pkg_resources.get_distribution("celery")
+        version("celery")
 
         # Celery is installed, overwrite fixture
         def inner(celery_config):
             celery_config.update(default_config)
             return celery_config
 
-    except pkg_resources.DistributionNotFound:
+    except PackageNotFoundError:
         # No Celery, return the default config
         def inner():
             return default_config
@@ -787,32 +787,7 @@ def bucket_from_dir(db, location):
     return create_bucket_from_dir
 
 
-class MockDistribution(pkg_resources.Distribution):
-    """A mocked distribution that we can inject entry points with."""
-
-    def __init__(self, extra_entry_points):
-        """Initialise the extra entry point."""
-        self._ep_map = {}
-        # Create the entry point group map (which eventually will be used to
-        # iterate over entry points). See source code for Distribution,
-        # EntryPoint and WorkingSet in pkg_resources module.
-        for group, entries in extra_entry_points.items():
-            group_map = {}
-            for ep_str in entries:
-                ep = pkg_resources.EntryPoint.parse(ep_str)
-                ep.require = self._require_noop
-                group_map[ep.name] = ep
-            self._ep_map[group] = group_map
-        # Note location must have a non-empty string value, as it is used as a
-        # key into a dictionary.
-        super().__init__(location="unknown")
-
-    def _require_noop(self, *args, **kwargs):
-        """Do nothing on entry point require."""
-        pass
-
-
-class MockImportlibDistribution(importlib_metadata.Distribution):
+class MockImportlibDistribution(importlib.metadata.Distribution):
     """A mocked distribution where we can inject entry points."""
 
     def __init__(self, extra_entry_points):
@@ -830,7 +805,7 @@ class MockImportlibDistribution(importlib_metadata.Distribution):
         for group, eps_lines in self._entry_points.items():
             for ep_line in eps_lines:
                 name, value = ep_line.split("=", maxsplit=1)
-                yield importlib_metadata.EntryPoint(
+                yield importlib.metadata.EntryPoint(
                     # strip possible white space due to split on "="
                     name=name.strip(),
                     value=value.strip(),
@@ -876,36 +851,21 @@ def entry_points(extra_entry_points):
             return _create_api
     """
     # Create mocked distributions
-    pkg_resources_dist = MockDistribution(extra_entry_points)
     importlib_dist = MockImportlibDistribution(extra_entry_points)
 
     #
     # Patch importlib
     #
-    old_distributions = importlib_metadata.distributions
+    old_distributions = importlib.metadata.distributions
 
     def distributions(**kwargs):
         for dist in old_distributions(**kwargs):
             yield dist
         yield importlib_dist
 
-    importlib_metadata.distributions = distributions
-
-    #
-    # Patch pkg_resources
-    #
-    # First make a copy of the working_set state, so that we can restore the
-    # state.
-    workingset_state = pkg_resources.working_set.__getstate__()
-    # Next, make a fake distribution that will yield the extra entry points and
-    # add them to the global working_set.
-    pkg_resources.working_set.add(pkg_resources_dist)
-
-    yield pkg_resources_dist
-
-    # Last, we restore the original workingset state and old importlib.
-    pkg_resources.working_set.__setstate__(workingset_state)
-    importlib_metadata.distributions = old_distributions
+    importlib.metadata.distributions = distributions
+    yield
+    importlib.metadata.distributions = old_distributions
 
 
 @pytest.fixture(scope="module")
