@@ -1,13 +1,17 @@
 ..
     This file is part of pytest-invenio.
     Copyright (C) 2018-2024 CERN.
-    Copyright (C) 2024 Graz University of Technology.
+    Copyright (C) 2024-2025 Graz University of Technology.
 
     pytest-invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version v3.4.0 (released 2025-06-27)
+
+- fix: pkg_resources DeprecationWarning
 
 Version v3.3.1 (released 2025-05-08)
 
