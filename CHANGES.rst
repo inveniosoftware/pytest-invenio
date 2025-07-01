@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version v3.4.1 (released 2025-07-01)
+
+- fix: importlib_metadata legacy
+
 Version v3.4.0 (released 2025-06-27)
 
 - fix: pkg_resources DeprecationWarning
