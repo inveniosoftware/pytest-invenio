@@ -20,12 +20,17 @@ from datetime import datetime
 from importlib.metadata import PackageNotFoundError, version
 from warnings import warn
 
-import importlib_metadata
 import pytest
 from pytest_flask.plugin import _make_test_response_class
 from selenium import webdriver
 
 from .user import UserFixtureBase
+
+python_minor = sys.version_info[1]
+
+if python_minor < 10:
+    import importlib_metadata
+
 
 SCREENSHOT_SCRIPT = """import base64
 with open('screenshot.png', 'wb') as fp:
@@ -820,36 +825,38 @@ class MockImportlibDistribution(importlib.metadata.Distribution):
         """Implement abstract method."""
 
 
-class MockImportlibLegacyDistribution(importlib_metadata.Distribution):
-    """A mocked distribution where we can inject entry points."""
+if python_minor < 10:
 
-    def __init__(self, extra_entry_points):
-        """Entry points for the distribution."""
-        self._entry_points = extra_entry_points
+    class MockImportlibLegacyDistribution(importlib_metadata.Distribution):
+        """A mocked distribution where we can inject entry points."""
 
-    @property
-    def name(self):
-        """Return the 'Name' metadata for the distribution package."""
-        return "MockDistribution"
+        def __init__(self, extra_entry_points):
+            """Entry points for the distribution."""
+            self._entry_points = extra_entry_points
 
-    @property
-    def entry_points(self):
-        """Iterate over entry points."""
-        for group, eps_lines in self._entry_points.items():
-            for ep_line in eps_lines:
-                name, value = ep_line.split("=", maxsplit=1)
-                yield importlib_metadata.EntryPoint(
-                    # strip possible white space due to split on "="
-                    name=name.strip(),
-                    value=value.strip(),
-                    group=group,
-                )
+        @property
+        def name(self):
+            """Return the 'Name' metadata for the distribution package."""
+            return "MockDistribution"
 
-    def read_text(self, *args, **kwargs):
-        """Implement abstract method."""
+        @property
+        def entry_points(self):
+            """Iterate over entry points."""
+            for group, eps_lines in self._entry_points.items():
+                for ep_line in eps_lines:
+                    name, value = ep_line.split("=", maxsplit=1)
+                    yield importlib_metadata.EntryPoint(
+                        # strip possible white space due to split on "="
+                        name=name.strip(),
+                        value=value.strip(),
+                        group=group,
+                    )
 
-    def locate_file(self, *args, **kwargs):
-        """Implement abstract method."""
+        def read_text(self, *args, **kwargs):
+            """Implement abstract method."""
+
+        def locate_file(self, *args, **kwargs):
+            """Implement abstract method."""
 
 
 @pytest.fixture(scope="module")
@@ -885,31 +892,37 @@ def entry_points(extra_entry_points):
     """
     # Create mocked distributions
     importlib_dist = MockImportlibDistribution(extra_entry_points)
-    importlib_legacy_dist = MockImportlibLegacyDistribution(extra_entry_points)
+    if python_minor < 10:
+        importlib_legacy_dist = MockImportlibLegacyDistribution(extra_entry_points)
 
     #
     # Patch importlib
     #
     old_distributions = importlib.metadata.distributions
-    old_legacy_distributions = importlib_metadata.distributions
+    if python_minor < 10:
+        old_legacy_distributions = importlib_metadata.distributions
 
     def distributions(**kwargs):
         for dist in old_distributions(**kwargs):
             yield dist
         yield importlib_dist
 
-    def distributions_legacy(**kwargs):
-        for dist in old_legacy_distributions(**kwargs):
-            yield dist
-        yield importlib_legacy_dist
+    if python_minor < 10:
+
+        def distributions_legacy(**kwargs):
+            for dist in old_legacy_distributions(**kwargs):
+                yield dist
+                yield importlib_legacy_dist
 
     importlib.metadata.distributions = distributions
-    importlib_metadata.distributions = distributions_legacy
+    if python_minor < 10:
+        importlib_metadata.distributions = distributions_legacy
 
     yield
 
     importlib.metadata.distributions = old_distributions
-    importlib_metadata.distributions = old_legacy_distributions
+    if python_minor < 10:
+        importlib_metadata.distributions = old_legacy_distributions
 
 
 @pytest.fixture(scope="module")
