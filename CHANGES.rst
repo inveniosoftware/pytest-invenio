@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version v3.4.2 (released 2025-07-09)
+
+- fix: use importlib_metadata <python3.10
+
 Version v3.4.1 (released 2025-07-01)
 
 - fix: importlib_metadata legacy
