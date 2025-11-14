@@ -12,6 +12,7 @@
 
 import ast
 import importlib.metadata
+import logging
 import os
 import shutil
 import sys
@@ -30,6 +31,8 @@ python_minor = sys.version_info[1]
 
 if python_minor < 10:
     import importlib_metadata
+
+fixture_log = logging.getLogger(__name__)
 
 
 SCREENSHOT_SCRIPT = """import base64
@@ -552,16 +555,94 @@ def db(database, db_session_options):
     from flask_sqlalchemy.session import Session as FlaskSQLAlchemySession
 
     class PytestInvenioSession(FlaskSQLAlchemySession):
+        """Custom session class to handle nested transactions properly.
+
+        This class overrides the commit and rollback methods to ensure that
+        nested transactions (savepoints) are properly managed during tests.
+        """
+
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+
         def get_bind(self, mapper=None, clause=None, bind=None, **kwargs):
             if self.bind:
                 return self.bind
             return super().get_bind(mapper=mapper, clause=clause, bind=bind, **kwargs)
 
         def rollback(self) -> None:
-            if self._transaction is None:
-                pass
-            else:
+            if self._transaction is not None:
                 self._transaction.rollback(_to_root=False)
+
+    class NestedSessionWrapper:
+        """Wrapper to manage nested transactions in tests.
+
+        This wrapper is necessary because test code often calls `db.session.commit()`
+        which should commit to a nested transaction (savepoint), not the outer
+        transaction. Without this wrapper, calling `db.session.commit()` would commit
+        the outer transaction, breaking the test isolation that allows rolling back
+        all changes at the end of each test.
+
+        The wrapper intercepts commit() and rollback() calls and routes them to the
+        nested transaction instead of the outer connection transaction. This ensures:
+
+        1. Test isolation: Each test's database changes are rolled back after the test
+        2. Performance: Using savepoints is much faster than recreating the database
+        3. Compatibility: Existing code that calls `db.session.commit()` works correctly
+
+        After each commit() or rollback(), the wrapper automatically starts a new
+        nested transaction (savepoint) to maintain the test isolation boundary.
+        """
+
+        def __init__(self, session, rollback_on_exit=False):
+            """Initialize the NestedSessionWrapper.
+
+            :param session: The SQLAlchemy session to wrap.
+            :param rollback_on_exit: Whether to rollback the session on exit.
+            """
+            self._session = session
+            self._nested_transaction = None
+            self._rollback_on_exit = rollback_on_exit
+
+        def commit(self) -> None:
+            """Always commit the current nested transaction (savepoint)."""
+            if self._nested_transaction is None:
+                raise RuntimeError("No active nested transaction to commit.")
+
+            self._nested_transaction.commit()
+            self._nested_transaction = self._session.begin_nested()
+
+        def rollback(self) -> None:
+            """Always rollback the current nested transaction (savepoint)."""
+            if self._nested_transaction is None:
+                raise RuntimeError("No active nested transaction to rollback.")
+
+            self._nested_transaction.rollback()
+            self._nested_transaction = self._session.begin_nested()
+
+        def __enter__(self):
+            """Enter the nested session context."""
+            self._nested_transaction = self._session.begin_nested()
+            return self
+
+        def __exit__(self, exc_type, exc_value, traceback):
+            """Exit the nested session context."""
+            self._nested_transaction = None
+            if self._rollback_on_exit:
+                try:
+                    self._session.rollback()
+                except Exception:
+                    fixture_log.exception(
+                        "Could not rollback session on exit, please expect side effects on subsequent tests."
+                    )
+
+        # pass unknown stuff to the underlying session
+        def __getattr__(self, name):
+            """Delegate attribute access to the underlying session."""
+            return getattr(self._session, name)
+
+        def __call__(self, *args, **kwargs):
+            """Delegate calls to the underlying session."""
+            return self._session(*args, **kwargs)
 
     connection = database.engine.connect()
     connection.begin()
@@ -574,16 +655,15 @@ def db(database, db_session_options):
     )
     session = database._make_scoped_session(options=options)
 
-    session.begin_nested()
-
     old_session = database.session
-    database.session = session
 
-    yield database
-
-    session.rollback()
-    connection.close()
-    database.session = old_session
+    try:
+        with NestedSessionWrapper(session, rollback_on_exit=True) as session_wrapper:
+            database.session = session_wrapper
+            yield database
+    finally:
+        connection.close()
+        database.session = old_session
 
 
 @pytest.fixture(scope="function")
