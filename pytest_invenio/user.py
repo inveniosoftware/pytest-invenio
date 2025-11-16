@@ -2,6 +2,7 @@
 #
 # This file is part of pytest-invenio.
 # Copyright (C) 2022-2025 CERN.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -10,7 +11,7 @@
 """Helper class for creating and using user fixtures."""
 
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class UserFixtureBase:
@@ -33,7 +34,7 @@ class UserFixtureBase:
         self._preferences = preferences
         self._email = email
         self._active = active
-        self._confirmed = datetime.utcnow() if confirmed else None
+        self._confirmed = datetime.now(timezone.utc) if confirmed else None
         self._password = password
         self._identity = None
         self._user = None
