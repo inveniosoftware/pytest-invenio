@@ -4,6 +4,7 @@
 # Copyright (C) 2017-2025 CERN.
 # Copyright (C) 2018 Esteban J. G. Garbancho.
 # Copyright (C) 2024-2025 Graz University of Technology.
+# Copyright (C) 2025 CESNET i.l.e.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -516,10 +517,28 @@ def database(appctx):
 
     db_.create_all()
 
+    # The test should use 1 connection (the same as the one here). If there is no
+    # open connection at this point, assume 1 connection is used.
+    connections_at_the_beginning = db_.engine.pool.checkedout() or 1
+
     yield db_
+
+    # get the number of checked out connections at the end of the tests
+    # if it is higher than at the beginning, some connections were not properly closed
+    # i.e. we have potential connection leaks either in tests or in tested code
+    connections_at_the_end = db_.engine.pool.checkedout() or 1
+    if connections_at_the_beginning < connections_at_the_end:
+        raise RuntimeError(
+            "Database connections were not properly closed. "
+            f"Connections at the beginning: {connections_at_the_beginning}, "
+            f"at the end: {connections_at_the_end}."
+        )
 
     db_.session.remove()
     db_.drop_all()
+
+    # dispose of the engine to close the underlying connection pool
+    db_.engine.dispose()
 
 
 @pytest.fixture(scope="function")
@@ -551,6 +570,11 @@ def db(database, db_session_options):
     """
     from flask_sqlalchemy.session import Session as FlaskSQLAlchemySession
 
+    from pytest_invenio.database_tools import (
+        purge_database_values,
+        store_database_values,
+    )
+
     class PytestInvenioSession(FlaskSQLAlchemySession):
         def get_bind(self, mapper=None, clause=None, bind=None, **kwargs):
             if self.bind:
@@ -563,27 +587,45 @@ def db(database, db_session_options):
             else:
                 self._transaction.rollback(_to_root=False)
 
-    connection = database.engine.connect()
-    connection.begin()
+    # the session.rollback() does not always clean everything, if the test
+    # used db.session.commit() and has not cleaned up after itself. We can not
+    # use nested transactions because a lot of Invenio code would need to be updated
+    # so that it is aware of the nested transaction concept. Instead, we store
+    # the database values here and purge any new rows after the test.
+    #
+    # We do it in explicit connection to avoid issues in tests that drop all tables
+    # (causes deadlock in alembic tests of invenio-pages on github actions, not
+    # reproducible locally).
+    with database.engine.connect() as connection:
+        with connection.begin():
+            stored_values = store_database_values(database.engine, connection)
 
-    options = dict(
-        bind=connection,
-        binds={},
-        **db_session_options,
-        class_=PytestInvenioSession,
-    )
-    session = database._make_scoped_session(options=options)
+    with database.engine.connect() as connection:
+        with connection.begin():
 
-    session.begin_nested()
+            options = dict(
+                bind=connection,
+                binds={},
+                **db_session_options,
+                class_=PytestInvenioSession,
+            )
 
-    old_session = database.session
-    database.session = session
+            session = database._make_scoped_session(options=options)
 
-    yield database
+            old_session = database.session
+            database.session = session
 
-    session.rollback()
-    connection.close()
-    database.session = old_session
+            yield database
+
+            session.rollback()
+            database.session = old_session
+
+    # use a brand new connection for the purge operation
+    with database.engine.connect() as connection:
+        purge_database_values(database.engine, connection, stored_values)
+
+    # expire all as there might be some stale data in the original database session
+    database.session.expire_all()
 
 
 @pytest.fixture(scope="function")
