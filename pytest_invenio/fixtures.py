@@ -230,6 +230,20 @@ def app_config(db_uri, broker_uri, celery_config_ext, search_hosts):
         },
     }
 
+    # extra database options to avoid connection pool exhaustion in tests
+    # not every package depends on sqlalchemy, so we need to import it here
+    # with the exception handled
+    try:
+        from sqlalchemy.pool import NullPool
+
+        db_options = {
+            "SQLALCHEMY_ENGINE_OPTIONS": {
+                "poolclass": NullPool,
+            },
+        }
+    except ImportError:
+        db_options = {}
+
     return dict(
         APP_DEFAULT_SECURE_HEADERS=dict(
             force_https=False, content_security_policy={"default-src": []}
@@ -262,6 +276,7 @@ def app_config(db_uri, broker_uri, celery_config_ext, search_hosts):
         # Theme
         APP_THEME=["semantic-ui"],
         THEME_ICONS=icons,
+        **db_options,
     )
 
 
