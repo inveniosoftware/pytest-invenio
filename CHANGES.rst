@@ -1,13 +1,18 @@
 ..
     This file is part of pytest-invenio.
     Copyright (C) 2018-2024 CERN.
-    Copyright (C) 2024-2025 Graz University of Technology.
+    Copyright (C) 2024-2026 Graz University of Technology.
 
     pytest-invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version v4.0.0 (released 2026-01-27)
+
+- fix: use now instead of utcnow
+- fix: replace SQLAlchemy pool with NullPool
 
 Version v3.4.2 (released 2025-07-09)
 

@@ -2,7 +2,7 @@
 #
 # This file is part of pytest-invenio.
 # Copyright (C) 2017-2025 CERN.
-# Copyright (C) 2024-2025 Graz University of Technology.
+# Copyright (C) 2024-2026 Graz University of Technology.
 #
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -499,7 +499,6 @@ information.
       - sleep 3 # give xvfb some time to start
 """
 
-
-__version__ = "3.4.2"
+__version__ = "4.0.0"
 
 __all__ = ("__version__",)
