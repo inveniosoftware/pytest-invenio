@@ -361,6 +361,8 @@ def test_db(conftest_testdir):
             assert db.session.query(UserA).count() == 1
 
         def test_db2(db):
+            # test that db fixture rolled back changes from
+            # the previous test
             assert db.session.query(UserA).count() == 0
             db.session.add(UserA(username='alice'))
             db.session.add(UserA(username='bob'))
@@ -368,6 +370,32 @@ def test_db(conftest_testdir):
     """
     )
     conftest_testdir.runpytest().assert_outcomes(passed=2)
+
+
+def test_db_commit(conftest_testdir):
+    """Test database creation and initialization."""
+    conftest_testdir.makepyfile(
+        """
+        from invenio_db import db
+
+        class UserA(db.Model):
+            id = db.Column(db.Integer, primary_key=True)
+            username = db.Column(db.String(80), unique=True)
+
+        def test_db_commit(db):
+            assert db.session.query(UserA).count() == 0
+            db.session.add(UserA(username='alice'))
+            db.session.commit()
+            assert db.session.query(UserA).count() == 1
+
+            # test that previously committed changes
+            # are not rolled back
+            db.session.add(UserA(username='bob'))
+            db.session.rollback()
+            assert db.session.query(UserA).count() == 1
+    """
+    )
+    conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_app(conftest_testdir):

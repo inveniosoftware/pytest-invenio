@@ -563,33 +563,56 @@ def db(database, db_session_options):
     You must use this fixture if your test connects to the database. The
     fixture will set a save point and rollback all changes performed during
     the test (this is much faster than recreating the entire database).
+
+    We need to address the global db.session.commit and db.session.rollback.
+    In sqlalchemy, they are implemented in a way that they commit/rollback
+    the top-level transaction, not the actual nested transaction. To address this,
+    we use sqlalchemy's built-in savepoint support.
     """
     from flask_sqlalchemy.session import Session as FlaskSQLAlchemySession
 
     class PytestInvenioSession(FlaskSQLAlchemySession):
         def get_bind(self, mapper=None, clause=None, bind=None, **kwargs):
-            if self.bind:
-                return self.bind
-            return super().get_bind(mapper=mapper, clause=clause, bind=bind, **kwargs)
-
-        def rollback(self) -> None:
-            if self._transaction is None:
-                pass
-            else:
-                self._transaction.rollback(_to_root=False)
+            # Override get_bind to return the Connection instead of the Engine.
+            #
+            # Flask-SQLAlchemy's default get_bind() returns an Engine, which would cause
+            # SQLAlchemy to create a new connection for each operation. By returning the
+            # Connection object directly, we ensure all operations use the same connection
+            # that's already in a transaction (started below with connection.begin()).
+            #
+            # This is required for join_transaction_mode="create_savepoint" to work properly.
+            # When the session calls get_bind() and receives a Connection (not Engine),
+            # SQLAlchemy detects the existing transaction and uses SAVEPOINT instead of
+            # BEGIN for session.begin()/commit()/rollback() operations. This allows tests
+            # to commit changes within the test while still rolling back everything at teardown.
+            #
+            # See SQLAlchemy's _connection_for_bind() in sqlalchemy/orm/session.py and:
+            # https://docs.sqlalchemy.org/en/21/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
+            return connection
 
     connection = database.engine.connect()
-    connection.begin()
 
+    # Begin an outer transaction that will persist for the entire test.
+    # This transaction will be rolled back during teardown to reset the database.
+    trans = connection.begin()
+
+    # Configure the session with join_transaction_mode="create_savepoint".
+    # This tells SQLAlchemy to use SAVEPOINT commands instead of BEGIN/COMMIT when
+    # the application code calls session.begin()/commit()/rollback(). This allows:
+    # 1. Application code to work normally (calling commit/rollback as usual)
+    # 2. All changes to remain within the outer transaction (trans)
+    # 3. Everything to be rolled back at test teardown for a clean slate
+    #
+    # The PytestInvenioSession.get_bind() override (above) is crucial - it ensures
+    # the session uses the Connection (not Engine), which enables this mechanism.
     options = dict(
         bind=connection,
+        join_transaction_mode="create_savepoint",
         binds={},
         **db_session_options,
         class_=PytestInvenioSession,
     )
     session = database._make_scoped_session(options=options)
-
-    session.begin_nested()
 
     old_session = database.session
     database.session = session
@@ -597,6 +620,8 @@ def db(database, db_session_options):
     yield database
 
     session.rollback()
+    session.close()
+    trans.rollback()
     connection.close()
     database.session = old_session
 
