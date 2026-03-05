@@ -563,6 +563,12 @@ def db(database, db_session_options):
     You must use this fixture if your test connects to the database. The
     fixture will set a save point and rollback all changes performed during
     the test (this is much faster than recreating the entire database).
+
+    We need to address the global db.session.commit and db.session.rollback.
+    In sqlalchemy, they are implemented in a way that they commit/rollback
+    the top-level transaction, not the actual nested transaction. To address this,
+    we wrap the session in a custom session class that overrides the commit and rollback
+    methods to commit/rollback the nested transaction instead.
     """
     from flask_sqlalchemy.session import Session as FlaskSQLAlchemySession
 
@@ -572,11 +578,15 @@ def db(database, db_session_options):
                 return self.bind
             return super().get_bind(mapper=mapper, clause=clause, bind=bind, **kwargs)
 
+        def commit(self) -> None:
+            self._nested_transaction.commit(_to_root=False)
+            # the commit closed the nested transaction, so we need to start a new one
+            self.begin_nested()
+
         def rollback(self) -> None:
-            if self._transaction is None:
-                pass
-            else:
-                self._transaction.rollback(_to_root=False)
+            self._nested_transaction.rollback(_to_root=False)
+            # the rollback closed the nested transaction, so we need to start a new one
+            self.begin_nested()
 
     connection = database.engine.connect()
     connection.begin()
@@ -589,6 +599,11 @@ def db(database, db_session_options):
     )
     session = database._make_scoped_session(options=options)
 
+    # the outer_nested transaction is a container for everything that happens in the test,
+    # so that we can rollback to it at the end of the test
+    outer_nested = session.begin_nested()
+
+    # this nested tra is the one that is closed by the commit/rollback in the session
     session.begin_nested()
 
     old_session = database.session
@@ -597,6 +612,7 @@ def db(database, db_session_options):
     yield database
 
     session.rollback()
+    outer_nested.rollback()
     connection.close()
     database.session = old_session
 
