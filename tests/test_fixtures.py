@@ -26,111 +26,94 @@ def test_version():
 def test_instance_path(testdir):
     """Test instance path."""
     assert "INVENIO_INSTANCE_PATH" not in os.environ
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import os
         def test_instance_path(instance_path):
             assert os.environ['INVENIO_INSTANCE_PATH'] == instance_path
             assert os.path.exists(instance_path)
             assert os.path.isdir(instance_path)
-    """
-    )
+    """)
     testdir.runpytest().assert_outcomes(passed=1)
     assert "INVENIO_INSTANCE_PATH" not in os.environ
 
 
 def test_db_uri(testdir):
     """Test default db uri."""
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import os
         def test_db_uri(db_uri, instance_path):
             assert 'SQLALCHEMY_DATABASE_URI' not in os.environ
             assert db_uri.startswith('sqlite:///{}'.format(instance_path))
-    """
-    )
+    """)
     testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_db_uri_env(testdir, monkeypatch):
     """Test db uri defined in environment variable."""
     monkeypatch.setenv("SQLALCHEMY_DATABASE_URI", "sqlite://")
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         def test_db_uri(db_uri):
             assert db_uri == 'sqlite://'
-    """
-    )
+    """)
     testdir.runpytest().assert_outcomes(passed=1)
     monkeypatch.undo()
 
 
 def test_broker_uri(testdir):
     """Test default broker uri."""
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import os
         def test_broker_uri(broker_uri):
             assert 'BROKER_URL' not in os.environ
             assert broker_uri == 'amqp://guest:guest@localhost:5672//'
-    """
-    )
+    """)
     testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_broker_uri_env(testdir, monkeypatch):
     """Test default broker uri."""
     monkeypatch.setenv("BROKER_URL", "env-value")
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         def test_broker_uri(broker_uri):
             assert broker_uri == 'env-value'
-    """
-    )
+    """)
     testdir.runpytest().assert_outcomes(passed=1)
     monkeypatch.undo()
 
 
 def test_search_hosts(testdir):
     """Test default search hosts."""
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import os
         def test_search_hosts(search_hosts):
             assert "SEARCH_HSOTS" not in os.environ
             assert search_hosts == [{'host': 'localhost', 'port': 9200}]
-    """
-    )
+    """)
     testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_search_hosts_env(testdir, monkeypatch):
     """Test search hosts defined in environment variable."""
     monkeypatch.setenv("SEARCH_HOSTS", "[{'host': 'host-from-env', 'port': 49200}]")
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         def test_search_hosts(search_hosts):
             assert search_hosts == [{'host': 'host-from-env', 'port': 49200}]
-    """
-    )
+    """)
     testdir.runpytest().assert_outcomes(passed=1)
     monkeypatch.undo()
 
 
 def test_app_config(testdir):
     """Test application and celery config."""
-    testdir.makepyfile(
-        test_app="""
+    testdir.makepyfile(test_app="""
         def test_app_config(app_config, db_uri, broker_uri):
             assert app_config['SQLALCHEMY_DATABASE_URI'] == db_uri
             assert app_config['BROKER_URL'] == broker_uri
             assert app_config['SECRET_KEY'] == 'test-secret-key'
             assert app_config['CELERY_TASK_ALWAYS_EAGER'] == True
-    """
-    )
+    """)
     # Test that application fixture can be overwritten in each module.
-    testdir.makepyfile(
-        test_app_overwrite="""
+    testdir.makepyfile(test_app_overwrite="""
         import pytest
 
         @pytest.fixture()
@@ -143,8 +126,7 @@ def test_app_config(testdir):
         def test_app_config(app_config, db_uri):
             assert app_config['SQLALCHEMY_DATABASE_URI'] == db_uri
             assert app_config['MYSTUFF']
-    """
-    )
+    """)
     testdir.runpytest().assert_outcomes(passed=2)
 
 
@@ -153,44 +135,37 @@ def test_base_app(conftest_testdir):
     # `conftest_testdir` defines a create_app fixture which are used by
     # base_app fixture to create a Flask application and inject the
     # configuration into the application.
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         def test_base_app(base_app, db_uri):
             assert base_app.config['SQLALCHEMY_DATABASE_URI'] == db_uri
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_base_client_jsonresponse(conftest_testdir):
     """Test the test client and json attribute on response object."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         def test_base_app(base_app, base_client):
             res = base_client.get('/api/')
             res.json == {'app_name': base_app.name}
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_appctx(conftest_testdir):
     """Test application factories."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         from flask import current_app
 
         def test_appctx(base_app, appctx):
             assert base_app.name == current_app.name
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_script_info(conftest_testdir):
     """Test script info command."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         import click
         from click.testing import CliRunner
         from flask import current_app
@@ -208,15 +183,13 @@ def test_script_info(conftest_testdir):
             result = runner.invoke(mycmd, obj=script_info)
             assert result.exit_code == 0
             assert result.output.startswith(base_app.name)
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_clirunner(conftest_testdir):
     """Test script info command."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         import click
         from flask import current_app
         from flask.cli import with_appcontext
@@ -230,15 +203,13 @@ def test_clirunner(conftest_testdir):
         # Run test on just defined CLI command.
         def test_cli(cli_runner):
             assert cli_runner(mycmd).exit_code == 0
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_clirunner_output(conftest_testdir):
     """Test script info command."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         import click
         from flask import current_app
         from flask.cli import with_appcontext
@@ -253,19 +224,16 @@ def test_clirunner_output(conftest_testdir):
         def test_cli(cli_runner):
             res = cli_runner(mycmd)
             assert 'My error' in res.output
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_search(conftest_testdir):
     """Test search initialization."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         def test_search(search):
             assert search.ping()
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
@@ -286,8 +254,7 @@ def test_search_clear(conftest_testdir):
             )
         )
     # Create test
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         import pytest
         from invenio_search import current_search_client, current_search
         from invenio_search.engine import search as search_engine
@@ -329,26 +296,22 @@ def test_search_clear(conftest_testdir):
             # But the index should exist
             assert current_search_client.indices.exists(
                 index='demo-default-v1.0.0')
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=2)
 
 
 def test_database(conftest_testdir):
     """Test database creation and initialization."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         def test_database(database, db_uri):
             assert str(database.engine.url.render_as_string(hide_password=False)) == db_uri
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_db(conftest_testdir):
     """Test database creation and initialization."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         from invenio_db import db
 
         class UserA(db.Model):
@@ -365,15 +328,13 @@ def test_db(conftest_testdir):
             db.session.add(UserA(username='alice'))
             db.session.add(UserA(username='bob'))
             assert db.session.query(UserA).count() == 2
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=2)
 
 
 def test_app(conftest_testdir):
     """Test database creation and initialization."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         from invenio_db import db
         from invenio_search import current_search_client
 
@@ -383,15 +344,13 @@ def test_app(conftest_testdir):
         def test_app(app):
             assert db.session.query(Place).count() == 0
             assert current_search_client.ping()
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_mailbox(conftest_testdir):
     """Test database creation and initialization."""
-    conftest_testdir.makepyfile(
-        test_mailbox="""
+    conftest_testdir.makepyfile(test_mailbox="""
         def test_mailbox(appctx, mailbox):
             assert len(mailbox) == 0
             appctx.extensions['mail'].send_message(
@@ -400,11 +359,9 @@ def test_mailbox(conftest_testdir):
                 body='test',
                 recipients=['no-reply@localhost'],)
             assert len(mailbox) == 1
-    """
-    )
+    """)
     # Test what happens if Invenio-Mail is not installed.
-    conftest_testdir.makepyfile(
-        test_mailbox_fail="""
+    conftest_testdir.makepyfile(test_mailbox_fail="""
         import pytest
 
         @pytest.fixture(scope='module')
@@ -414,19 +371,16 @@ def test_mailbox(conftest_testdir):
 
         def test_mailbox(appctx, mailbox):
             pass  # Will never reach here.
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1, errors=1)
 
 
 def test_browser_skipped(conftest_testdir):
     """Test that end-to-end tests are skipped unless E2E env var is set."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         def test_browser(live_server, browser):
             browser.get(url_for('index', _external=True))
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(skipped=1)
 
 
@@ -435,8 +389,7 @@ def test_browser(conftest_testdir, monkeypatch):
     """Test live server and selenium."""
     monkeypatch.setenv("E2E", "yes")
     monkeypatch.setenv("E2E_OUTPUT", "file")
-    conftest_testdir.makepyfile(
-        test_browsers="""
+    conftest_testdir.makepyfile(test_browsers="""
         from flask import url_for
 
         def test_browser(live_server, browser):
@@ -446,8 +399,7 @@ def test_browser(conftest_testdir, monkeypatch):
         def test_browser_fail(live_server, browser):
             browser.get(url_for('index', _external=True))
             assert browser.title != 'pytest-invenio'
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1, failed=1)
     assert os.path.exists(
         os.path.join(str(conftest_testdir.tmpdir), ".e2e_screenshots")
@@ -457,22 +409,19 @@ def test_browser(conftest_testdir, monkeypatch):
 
 def test_celery_config_ext(testdir):
     """Test celery config."""
-    testdir.makepyfile(
-        test_app="""
+    testdir.makepyfile(test_app="""
         def test_celery_config_with_celery(celery_config_ext):
             assert celery_config_ext['CELERY_TASK_ALWAYS_EAGER'] == True
             assert celery_config_ext['CELERY_CACHE_BACKEND'] == 'memory'
             assert celery_config_ext[
             'CELERY_TASK_EAGER_PROPAGATES_EXCEPTIONS'] == True
             assert celery_config_ext['CELERY_RESULT_BACKEND'] == 'cache'
-    """
-    )
+    """)
     testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_default_location(conftest_testdir):
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         from invenio_files_rest.models import Bucket
 
         def test_default_location_create(location):
@@ -480,14 +429,12 @@ def test_default_location(conftest_testdir):
             assert location.name == "pytest-location"
             assert location.uri is not None
             assert new_bucket.location == location
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_bucket_from_dir(conftest_testdir):
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         import tempfile, os
         from invenio_files_rest.models import ObjectVersion
 
@@ -508,15 +455,13 @@ def test_bucket_from_dir(conftest_testdir):
             assert files_from_bucket.count() == 1
             # And check if this file has proper key
             assert files_from_bucket.one().key == "output_file"
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_entrypoint_invenio_base(testdir):
     """Test database creation and initialization."""
-    testdir.makeconftest(
-        """
+    testdir.makeconftest("""
         import pytest
 
         from flask import Flask
@@ -532,10 +477,8 @@ def test_entrypoint_invenio_base(testdir):
         @pytest.fixture(scope='module')
         def create_app(entry_points):
             return partial(_factory, 'app')
-    """
-    )
-    testdir.makepyfile(
-        mock_module="""
+    """)
+    testdir.makepyfile(mock_module="""
         from invenio_db import db
         from invenio_base.utils import entry_points
 
@@ -544,10 +487,8 @@ def test_entrypoint_invenio_base(testdir):
 
         def db_entry_points():
             return entry_points('invenio_db.models')
-    """
-    )
-    testdir.makepyfile(
-        test_ep="""
+    """)
+    testdir.makepyfile(test_ep="""
         import pytest
         # By importing we get a reference to iter_entry_points before it
         # has been mocked (to test that this case also works).
@@ -571,15 +512,13 @@ def test_entrypoint_invenio_base(testdir):
                 if ep.name == 'mock_module':
                     return
             assert False, "mock_module not found in entry points"
-    """
-    )
+    """)
     testdir.runpytest("-s").assert_outcomes(passed=2)
 
 
 def test_entrypoint_importlib(testdir):
     """Test database creation and initialization."""
-    testdir.makeconftest(
-        """
+    testdir.makeconftest("""
         import pytest
 
         from flask import Flask
@@ -595,10 +534,8 @@ def test_entrypoint_importlib(testdir):
         @pytest.fixture(scope='module')
         def create_app(entry_points):
             return partial(_factory, 'app')
-    """
-    )
-    testdir.makepyfile(
-        mock_module="""
+    """)
+    testdir.makepyfile(mock_module="""
         from invenio_db import db
         from invenio_base.utils import entry_points
 
@@ -607,10 +544,8 @@ def test_entrypoint_importlib(testdir):
 
         def db_entry_points():
             return entry_points(group='invenio_db.models')
-    """
-    )
-    testdir.makepyfile(
-        test_ep="""
+    """)
+    testdir.makepyfile(test_ep="""
         import pytest
         # By importing we get a reference to entry_points before it
         # has been mocked (to test that this case also works).
@@ -634,15 +569,13 @@ def test_entrypoint_importlib(testdir):
                 if ep.name == 'mock_module':
                     return
             assert False, "mock_module not found in entry points"
-    """
-    )
+    """)
     testdir.runpytest("-s").assert_outcomes(passed=2)
 
 
 def test_set_app_config_fn_scoped(conftest_testdir):
     """Test temporary config settings."""
-    conftest_testdir.makepyfile(
-        """
+    conftest_testdir.makepyfile("""
         import pytest
 
         @pytest.fixture(scope='module')
@@ -672,6 +605,5 @@ def test_set_app_config_fn_scoped(conftest_testdir):
 
             assert "baz" == base_app.config["MYSTUFF"]
             assert "foo" == base_app.config["MYSTUFF2"]
-    """
-    )
+    """)
     conftest_testdir.runpytest().assert_outcomes(passed=2)

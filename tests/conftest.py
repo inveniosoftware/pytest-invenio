@@ -16,8 +16,7 @@ pytest_plugins = ["pytester"]
 @pytest.fixture()
 def conftest_testdir(testdir):
     """Conftest fixture with app factories defined."""
-    testdir.makeconftest(
-        """
+    testdir.makeconftest("""
         import pytest
 
         from flask import Flask, jsonify, current_app
@@ -55,8 +54,7 @@ def conftest_testdir(testdir):
         @pytest.fixture(scope='module')
         def UserCls():
             return User
-    """
-    )
+    """)
     testdir.makefile(
         ".ini",
         pytest="""
