@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version v4.0.1 (released 2026-03-16)
+
+- fix: forcing nested transactions
+
 Version v4.0.0 (released 2026-01-27)
 
 - fix: use now instead of utcnow

@@ -499,6 +499,6 @@ information.
       - sleep 3 # give xvfb some time to start
 """
 
-__version__ = "4.0.0"
+__version__ = "4.0.1"
 
 __all__ = ("__version__",)
