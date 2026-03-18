@@ -6,109 +6,86 @@
 # pytest-invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Versioning manager for pytest-invenio.
+"""Versioning support for pytest-invenio.
 
-Note: this module must be imported from within a fixture function, not on a top-level
-as not all Invenio modules depend on invenio-db and thus SQLAlchemy and SQLAlchemy-Continuum.
+Note: import this module from inside a fixture, not at module level, because not
+all Invenio modules depend on invenio-db, SQLAlchemy, and SQLAlchemy-Continuum.
 """
+
+from unittest.mock import patch
 
 import sqlalchemy as sa
 from sqlalchemy_continuum import UnitOfWork, VersioningManager
 
 
-def is_joined_session(session):
-    return session.join_transaction_mode == "create_savepoint"
+class NonNestingSession(sa.orm.session.Session):
+    """Session subclass used by sqlalchemy-continuum in tests.
+
+    The main test session created by the `db` fixture uses savepoints
+    (via `create_savepoint` join transaction mode) to isolate tests.
+    SQLAlchemy-Continuum opens another session on the same connection to
+    flush its `Transaction` row and obtain its id::
+
+        +----------------------------------------------+
+        |  db connection (sa.base.Connection)          |
+        +----------------------------------------------+
+        | Savepoint                                    |
+        +----------------------------------------------+
+                 ^                          ^
+                 |                          |
+        +---------------------+    +-------------------+
+        | test session        |    | continuum session |
+        +---------------------+    +-------------------+
+        | nested transaction  |
+        +---------------------+
+
+    Using a regular `Session` here would create an extra nested transaction
+    and savepoint on the shared connection. The two sessions would then manage
+    different savepoints, which leads to transaction-state warnings.
+
+    This subclass sets `join_transaction_mode="control_fully"` so the temporary
+    continuum session reuses the connection without creating its own savepoint.
+    That is safe here because continuum uses this session only for `flush()`;
+    commit and rollback still happen on the original test session.
+
+    Example of how sqlalchemy-continuum's `UnitOfWork` uses this session:
+
+        .. code-block:: python
+
+                self.version_session = NonNestingSession(bind=session.connection())
+                self.version_session.add(self.current_transaction)
+                self.version_session.flush()
+                self.version_session.expunge(self.current_transaction)
+                session.add(self.current_transaction)
+                # <-- note: no commit was called on the version_session
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize the session with `join_transaction_mode="control_fully"`."""
+        kwargs["join_transaction_mode"] = "control_fully"
+        super().__init__(*args, **kwargs)
 
 
 class PytestInvenioUnitOfWork(UnitOfWork):
+    """Unit of work class that enables using sqlalchemy-continuum with create-savepoint mode."""
+
     def process_before_flush(self, session):
-        """
-        Before flush processor for given session.
-
-        This method creates a version session which is later on used for the
-        creation of version objects. It also creates Transaction object for the
-        current transaction and invokes before_flush template method on all
-        plugins.
-
-        If the given session had no relevant modifications regarding versioned
-        objects this method does nothing.
-
-        :param session: SQLAlchemy session object
-        """
-        if session == self.version_session:
-            return
-
-        if not self.is_modified(session):
-            return
-
-        if not self.version_session:
-            self.version_session = sa.orm.session.Session(bind=session.connection())
-            self.version_session.join_transaction_mode = "control_fully"
-
-        if not self.current_transaction:
-            self.create_transaction(session)
-
-        self.manager.plugins.before_flush(self, session)
+        """Temporarily replace continuum's session class and call the parent."""
+        with patch("sqlalchemy.orm.session.Session", NonNestingSession):
+            super().process_before_flush(session)
 
     def process_after_flush(self, session):
-        """
-        After flush processor for given session.
-
-        Creates version objects for all modified versioned parent objects that
-        were affected during the flush phase.
-
-        :param session: SQLAlchemy session object
-        """
-        if session == self.version_session:
-            return
-
-        if not self.current_transaction:
-            return
-
-        if not self.version_session:
-            self.version_session = sa.orm.session.Session(bind=session.connection())
-            self.version_session.join_transaction_mode = "control_fully"
-
-        self.make_versions(session)
-
-    def transaction_args(self, session):
-        args = {}
-        for plugin in self.manager.plugins:
-            args.update(plugin.transaction_args(self, session))
-        return args
+        """Temporarily replace continuum's session class and call the parent."""
+        with patch("sqlalchemy.orm.session.Session", NonNestingSession):
+            super().process_after_flush(session)
 
     def create_transaction(self, session):
-        """
-        Create transaction object for given SQLAlchemy session.
-
-        :param session: SQLAlchemy session object
-        """
-        args = self.transaction_args(session)
-
-        Transaction = self.manager.transaction_cls
-        self.current_transaction = Transaction()
-
-        for key, value in args.items():
-            setattr(self.current_transaction, key, value)
-        if not self.version_session:
-            self.version_session = sa.orm.session.Session(bind=session.connection())
-            self.version_session.join_transaction_mode = "control_fully"
-        self.version_session.add(self.current_transaction)
-        self.version_session.flush()
-        self.version_session.expunge(self.current_transaction)
-        session.add(self.current_transaction)
-        return self.current_transaction
+        """Temporarily replace continuum's session class and call the parent."""
+        with patch("sqlalchemy.orm.session.Session", NonNestingSession):
+            return super().create_transaction(session)
 
 
-class PytestInvenioVersioningManager(VersioningManager):
-    def __init__(self):
-        super().__init__(unit_of_work_cls=PytestInvenioUnitOfWork)
-
-    # def clear(self, session):
-    #     if not is_joined_session(session):
-    #         return
-    #     super().clear(session)
-
-
-pytest_invenio_versioning_manager = PytestInvenioVersioningManager()
-"""A versioning manager instance for all tests. Note that this must be a singleton instance."""
+pytest_invenio_versioning_manager = VersioningManager(
+    unit_of_work_cls=PytestInvenioUnitOfWork
+)
+"""Singleton versioning manager shared by all tests."""
