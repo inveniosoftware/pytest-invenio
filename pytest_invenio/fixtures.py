@@ -236,10 +236,14 @@ def app_config(db_uri, broker_uri, celery_config_ext, search_hosts):
     try:
         from sqlalchemy.pool import NullPool
 
+        from .versioning import pytest_invenio_versioning_manager
+
         db_options = {
             "SQLALCHEMY_ENGINE_OPTIONS": {
                 "poolclass": NullPool,
             },
+            # singleton instance of the versioning manager to be used across all tests
+            "DB_VERSIONING_MANAGER": pytest_invenio_versioning_manager,
         }
     except ImportError:
         db_options = {}
@@ -265,6 +269,7 @@ def app_config(db_uri, broker_uri, celery_config_ext, search_hosts):
         # Database configuration
         SQLALCHEMY_DATABASE_URI=db_uri,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        # SQLALCHEMY_ECHO=True,
         # Search configuration
         SEARCH_HOSTS=search_hosts,
         # Flask testing mode
@@ -588,6 +593,9 @@ def db(database, db_session_options):
             #
             # See SQLAlchemy's _connection_for_bind() in sqlalchemy/orm/session.py and:
             # https://docs.sqlalchemy.org/en/21/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
+            return connection
+
+        def connection(self):
             return connection
 
     connection = database.engine.connect()
