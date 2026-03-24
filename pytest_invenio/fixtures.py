@@ -716,7 +716,7 @@ def browser(request):
 
         options = Options()
         options.add_argument("--headless")
-        driver = getattr(webdriver, browser_name)(chrome_options=options)
+        driver = getattr(webdriver, browser_name)(options=options)
     else:
         driver = getattr(webdriver, browser_name)()
 
