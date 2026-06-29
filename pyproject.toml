@@ -1,4 +1,100 @@
-[build-system]
-requires = ["setuptools", "wheel", "babel>2.8"]
-build-backend = "setuptools.build_meta"
+# SPDX-FileCopyrightText: 2017-2025 CERN.
+# SPDX-FileCopyrightText: 2018 Esteban J. G. Garbancho.
+# SPDX-FileCopyrightText: 2018 Northwestern University, Feinberg School of Medicine.
+# SPDX-FileCopyrightText: 2022-2026 Graz University of Technology.
+# SPDX-FileCopyrightText: 2026 TU Wien.
+# SPDX-License-Identifier: MIT
 
+[project]
+name = "pytest-invenio"
+description = "Pytest fixtures for Invenio."
+readme = "README.rst"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+  { name = "CERN", email = "info@inveniosoftware.org" },
+]
+keywords = [
+  "invenio",
+  "pytest",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+]
+dependencies = [
+  "check-manifest>=0.42",
+  "coverage>=5.3,<8",
+  "docker-services-cli>=0.4.0",
+  "pytest>=6,<9.0.0",
+  "pytest-cov>=3.0.0",
+  "pytest-flask>=1.2.0",
+  "pytest-github-actions-annotate-failures>=0.2.0",
+  "pytest-isort>=3.0.0",
+  "pytest-pycodestyle>=2.2.0",
+  "pytest-pydocstyle>=2.2.3",
+  "selenium>=3.7.0,<5",
+  "snowballstemmer>=2.2.0,<3",
+]
+dynamic = ["version"]
+
+[project.urls]
+Repository = "https://github.com/inveniosoftware/pytest-invenio"
+
+[project.entry-points.pytest11]
+invenio = "pytest_invenio.plugin"
+
+[project.optional-dependencies]
+docs = []
+elasticsearch7 = [
+  "invenio-search[elasticsearch7]>=3.0.0,<4.0.0",
+]
+opensearch1 = [
+  "invenio-search[opensearch1]>=3.0.0,<4.0.0",
+]
+opensearch2 = [
+  "invenio-search[opensearch2]>=3.0.0,<4.0.0",
+]
+tests = [
+  "black<26.0.0",
+  "invenio-celery>=2.0.0,<3.0.0",
+  "invenio-db>=2.0.0,<3.0.0",
+  "invenio-files-rest>=4.0.0,<5.0.0",
+  "invenio-mail>=1.0.2,<3.0.0",
+  "invenio-search>=3.0.0,<4.0.0",
+  "pytest-black>=0.6.0",
+  "sphinx>=4.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "pytest_invenio/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/pytest_invenio",
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.pydocstyle]
+add_ignore = "D401"
+
+[tool.pytest.ini_options]
+addopts = '--black --isort --pydocstyle --doctest-glob="*.rst" --doctest-modules --cov=pytest_invenio --cov-report=term-missing'
+testpaths = "tests pytest_invenio"
+live_server_scope = "module"
+
+# UV needs to be told explicitly which extras are conflicting:
+# https://docs.astral.sh/uv/concepts/projects/config/#conflicting-dependencies
+[tool.uv]
+conflicts = [
+  [
+    { extra = "opensearch1" },
+    { extra = "opensearch2" },
+    { extra = "elasticsearch7" },
+  ]
+]
