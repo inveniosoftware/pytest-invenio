@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2017-2025 CERN.
 # SPDX-FileCopyrightText: 2024-2026 Graz University of Technology.
+# SPDX-FileCopyrightText: 2026 TU Wien.
 # SPDX-License-Identifier: MIT
 
 """Pytest fixtures for Invenio.
@@ -494,6 +495,6 @@ information.
       - sleep 3 # give xvfb some time to start
 """
 
-__version__ = "4.0.1"
+__version__ = "4.0.2"
 
 __all__ = ("__version__",)
