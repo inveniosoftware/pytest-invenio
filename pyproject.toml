@@ -22,7 +22,6 @@ classifiers = [
   "Development Status :: 5 - Production/Stable",
 ]
 dependencies = [
-  "check-manifest>=0.42",
   "coverage>=5.3,<8",
   "docker-services-cli>=0.4.0",
   "pytest>=6,<9.0.0",
@@ -34,11 +33,15 @@ dependencies = [
   "pytest-pydocstyle>=2.2.3",
   "selenium>=3.7.0,<5",
   "snowballstemmer>=2.2.0,<3",
+  "tomli>=1.1.0;python_version<'3.11'",
 ]
 dynamic = ["version"]
 
 [project.urls]
 Repository = "https://github.com/inveniosoftware/pytest-invenio"
+
+[project.scripts]
+run-tests = "pytest_invenio.cli:run_tests_cli"
 
 [project.entry-points.pytest11]
 invenio = "pytest_invenio.plugin"
@@ -84,9 +87,25 @@ profile = "black"
 add_ignore = "D401"
 
 [tool.pytest.ini_options]
-addopts = '--black --isort --pydocstyle --doctest-glob="*.rst" --doctest-modules --cov=pytest_invenio --cov-report=term-missing'
+addopts = '--black --isort --pydocstyle --doctest-glob="*.rst" --doctest-modules --cov=pytest_invenio --cov-report=term-missing --runpytest=subprocess'
 testpaths = "tests pytest_invenio"
 live_server_scope = "module"
+
+[tool.pytest-invenio]
+randomize_ports = false
+project_name = "pytest-invenio"
+
+[tool.pytest-invenio.services]
+search = "opensearch"
+
+# [tool.pytest-invenio.env-copy-to-from]
+# ACCOUNTS_SESSION_REDIS_URL = "CACHE_REDIS_URL"  # redis://localhost:6379/1',
+# CACHE_REDIS_URL = "CACHE_REDIS_URL"  # redis://localhost:6379/0',
+# CELERY_RESULT_BACKEND = "CACHE_REDIS_URL"  # redis://localhost:6379/2',
+# RATELIMIT_STORAGE_URI = "CACHE_REDIS_URL"  # redis://localhost:6379/3',
+# COMMUNITIES_IDENTITIES_CACHE_REDIS_URL = "CACHE_REDIS_URL"  # redis://localhost:6379/4',
+# IIIF_CACHE_REDIS_URL = "CACHE_REDIS_URL"  # redis://localhost:6379/0'}
+# CELERY_BROKER_URL = "BROKER_URL"  # guest:guest
 
 # UV needs to be told explicitly which extras are conflicting:
 # https://docs.astral.sh/uv/concepts/projects/config/#conflicting-dependencies
