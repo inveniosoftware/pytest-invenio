@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2017-2025 CERN.
 # SPDX-FileCopyrightText: 2018-2025 Northwestern University.
-# SPDX-FileCopyrightText: 2025 Graz University of Technology.
+# SPDX-FileCopyrightText: 2025-2026 Graz University of Technology.
 # SPDX-License-Identifier: MIT
 
 """Pytest plugin for Invenio.
@@ -49,6 +49,7 @@ from .fixtures import (  # noqa
     search_clear,
     search_hosts,
     set_app_config_fn_scoped,
+    uow_class,
 )
 
 

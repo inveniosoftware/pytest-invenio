@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2017-2025 CERN.
 # SPDX-FileCopyrightText: 2018 Esteban J. G. Garbancho.
-# SPDX-FileCopyrightText: 2024-2025 Graz University of Technology.
+# SPDX-FileCopyrightText: 2024-2026 Graz University of Technology.
 # SPDX-License-Identifier: MIT
 
 """Pytest fixtures for Invenio."""
@@ -276,7 +276,30 @@ def app_config(db_uri, broker_uri, celery_config_ext, search_hosts):
 
 
 @pytest.fixture(scope="module")
-def base_app(create_app, app_config, request, default_handler):
+def uow_class():
+    """Customize UnitOfWork class used in VersioningManager."""
+    from sqlalchemy_continuum import versioning_manager
+    from sqlalchemy_continuum.unit_of_work import UnitOfWork
+
+    class InvenioVersionUnitOfWork(UnitOfWork):
+        """UnitOfWork that releases its private version-session savepoint."""
+
+        def make_versions(self, session):
+            """Override parent make_version to commit version session."""
+            super().make_versions(session)
+
+            # this removes the "nested transaction already deassociated from
+            # connection" SAWarning in the tests
+            self.version_session.commit()
+
+    original = versioning_manager.uow_class
+    versioning_manager.uow_class = InvenioVersionUnitOfWork
+    yield
+    versioning_manager.uow_class = original
+
+
+@pytest.fixture(scope="module")
+def base_app(create_app, app_config, request, default_handler, uow_class):
     """Base application fixture (without database, search and cache).
 
     Scope: module.
