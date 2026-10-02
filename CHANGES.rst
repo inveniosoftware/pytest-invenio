@@ -7,6 +7,11 @@
 Changes
 =======
 
+Version v4.0.3 (released 2026-10-08)
+
+- fix: SAWarning around nested transaction
+- fix: compatibility with python3.9
+
 Version v4.0.2 (released 2026-03-16)
 
 - chore(setup): migrate from setuptools to hatchling
