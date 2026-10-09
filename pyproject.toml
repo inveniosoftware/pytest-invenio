@@ -32,7 +32,7 @@ dependencies = [
   "pytest-isort>=3.0.0",
   "pytest-pycodestyle>=2.2.0",
   "pytest-pydocstyle>=2.2.3",
-  "selenium>=3.7.0,<5",
+  "selenium>=3.8.0,<5",
   "snowballstemmer>=2.2.0,<3",
 ]
 dynamic = ["version"]
