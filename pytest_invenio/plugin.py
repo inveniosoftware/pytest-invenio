@@ -48,6 +48,7 @@ from .fixtures import (  # noqa
     search,
     search_clear,
     search_hosts,
+    search_index_names,
     set_app_config_fn_scoped,
     uow_class,
 )
