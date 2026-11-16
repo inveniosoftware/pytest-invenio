@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2017-2018 CERN.
 # SPDX-FileCopyrightText: 2024-2025 Graz University of Technology.
 # SPDX-FileCopyrightText: 2025 Northwestern University.
+# SPDX-FileCopyrightText: 2026 CESNET z.s.p.o.
 # SPDX-License-Identifier: MIT
 
 """Module tests."""
@@ -327,6 +328,22 @@ def test_search_clear(conftest_testdir):
     """
     )
     conftest_testdir.runpytest().assert_outcomes(passed=2)
+
+
+def test_search_index_names(conftest_testdir):
+    """Test search index names."""
+    conftest_testdir.makepyfile(
+        """
+        def test_index_names(search, search_index_names):
+            assert search_index_names() == set()
+            search.indices.create(index='demo')
+            try:
+                assert search_index_names() == {'demo'}
+            finally:
+                search.indices.delete(index='demo')
+    """
+    )
+    conftest_testdir.runpytest().assert_outcomes(passed=1)
 
 
 def test_database(conftest_testdir):

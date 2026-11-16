@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2017-2025 CERN.
 # SPDX-FileCopyrightText: 2018 Esteban J. G. Garbancho.
 # SPDX-FileCopyrightText: 2024-2026 Graz University of Technology.
+# SPDX-FileCopyrightText: 2026 CESNET z.s.p.o.
 # SPDX-License-Identifier: MIT
 
 """Pytest fixtures for Invenio."""
@@ -507,6 +508,37 @@ def search_clear(search):
     yield search
     _search_delete_indexes(current_search)
     _search_create_indexes(current_search, current_search_client)
+
+
+@pytest.fixture(scope="function")
+def search_index_names(search):
+    """Get the set of names of the indices in the search cluster.
+
+    Scope: function
+
+    Returns a function that returns the set of index names currently present
+    in OpenSearch. System indices (names starting with a dot, e.g. those
+    created by the OpenSearch ML Commons plugin) are left out.
+
+    The returned names are concrete index names (including the
+    ``SEARCH_INDEX_PREFIX`` and version suffix), not alias names.
+
+    Usage:
+
+    .. code-block:: python
+
+        def test_something(search_index_names):
+            assert search_index_names() == {"records-record-v1.0.0"}
+
+    Note: the ML Commons plugin cannot easily be disabled (the only option
+    today is a custom Docker image), which is why its indices are removed
+    here.
+    """
+
+    def index_names():
+        return {name for name in search.indices.get_alias() if not name.startswith(".")}
+
+    return index_names
 
 
 @pytest.fixture(scope="function")
