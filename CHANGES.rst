@@ -7,6 +7,11 @@
 Changes
 =======
 
+Version v4.1.0 (released 2026-11-19)
+
+- fix: exclude system indices
+- fix: argument for webdriver updated to Selenium 3.8.0
+
 Version v4.0.3 (released 2026-10-08)
 
 - fix: SAWarning around nested transaction
