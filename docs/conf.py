@@ -6,8 +6,6 @@
 
 import sys
 
-import sphinx.environment
-
 from pytest_invenio import __version__
 
 # Plug example application into module path
