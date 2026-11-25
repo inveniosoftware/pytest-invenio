@@ -517,8 +517,13 @@ def search_index_names(search):
     Scope: function
 
     Returns a function that returns the set of index names currently present
-    in OpenSearch. System indices (names starting with a dot, e.g. those
-    created by the OpenSearch ML Commons plugin) are left out.
+    in OpenSearch. Indices created in the background by OpenSearch plugins
+    are left out:
+
+    * system indices (names starting with a dot, e.g. those created by the
+      ML Commons plugin),
+    * ``top_queries-*`` indices created by the Query Insights plugin, which
+      periodically exports the slowest/most expensive queries to a local index.
 
     The returned names are concrete index names (including the
     ``SEARCH_INDEX_PREFIX`` and version suffix), not alias names.
@@ -530,13 +535,23 @@ def search_index_names(search):
         def test_something(search_index_names):
             assert search_index_names() == {"records-record-v1.0.0"}
 
-    Note: the ML Commons plugin cannot easily be disabled (the only option
-    today is a custom Docker image), which is why its indices are removed
-    here.
+    Note: these plugins are part of the default OpenSearch distribution and
+    create their indices at unpredictable times, which is why their indices
+    are removed here. They can't be easily switched off.
     """
+    ignored_prefixes = (
+        # for example, ml commons
+        ".",
+        # insights top queries, comes with OS 2/3, created after 5 mins
+        "top_queries-",
+    )
 
     def index_names():
-        return {name for name in search.indices.get_alias() if not name.startswith(".")}
+        return {
+            name
+            for name in search.indices.get_alias()
+            if not name.startswith(ignored_prefixes)
+        }
 
     return index_names
 
